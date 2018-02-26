@@ -5,6 +5,7 @@
  */
 package com.apu.olxcrawler;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,10 +29,49 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 public class OlxParser {
     
     private static final Log log = Log.getInstance();
-    private final Class classname = OlxParser.class;
-    
-    private final String OLX_HOST_URL = "https://www.olx.ua/";    
+    private final Class classname = OlxParser.class;    
+        
     private final String OLX_PHONE_URL = "ajax/misc/contact/phone/";
+    
+    public List<String> parseSearchResult(String content) {
+        List<String> list = new ArrayList<>();
+        String regExpUrl = "https://www.olx.ua/obyavlenie/(.+)\" class=\"marginright5 link linkWithHash detailsLink\"";
+        Pattern pattern = Pattern.compile(regExpUrl, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);        
+        Matcher matcher = pattern.matcher(content); 
+        Integer redultInt = matcher.groupCount();
+        if(matcher.find() != false) {
+            Integer startPos = matcher.start();
+            Integer endPos = matcher.end();
+            String contentTemp = content.substring(startPos, endPos);
+            Pointer position = new Pointer();
+            String lastLink = "";
+            while(true) {
+                String link = getLinkFromContent(contentTemp, position);
+                if(link == null)
+                        break;
+                if(link.equals(lastLink)) 
+                        continue;
+                lastLink = link;
+                list.add(link);
+            }            
+        }      
+        return list;
+    }
+    
+    private String getLinkFromContent(String content, Pointer startPosition) {        
+        String linkStartPattern = "https://www.olx.ua/obyavlenie/";
+        String linkEndPattern = "\"";
+        int linkStartPosition = content.indexOf(linkStartPattern, 
+                                        startPosition.get());
+        if(linkStartPosition == -1)
+                            return null;
+        int linkEndPosition = content.indexOf(linkEndPattern, 
+                                        linkStartPosition + 1);
+        if(linkEndPosition == -1)
+                            return null;        
+        startPosition.set(linkEndPosition);        
+        return content.substring(linkStartPosition, linkEndPosition);
+    }
     
     String requestPhoneFromUrl(String urlStr) {
         String phoneResult = null;
@@ -70,7 +110,7 @@ public class OlxParser {
             if(token == null)   
                     return null;
             
-            String requestPhoneNumber = OLX_HOST_URL + 
+            String requestPhoneNumber = OlxVariables.OLX_HOST_URL + 
                                     OLX_PHONE_URL + idStr + "/?pt=" + token;
             log.debug(classname, requestPhoneNumber);
             
