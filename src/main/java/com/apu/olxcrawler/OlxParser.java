@@ -42,6 +42,8 @@ public class OlxParser {
         adwert.setPublicationDate(getPublicationDateFromContent(content));
         adwert.setRegion(getRegionFromContent(content));
         adwert.setPhone(getPhoneFromUrlAndResult(link, result));
+        adwert.setUserOffers(getUserOffersFromContent(content));
+        adwert.setUserSince(getUserSinceFromContent(content));
         
         return adwert;
     }
@@ -94,12 +96,15 @@ public class OlxParser {
         String token = getTokenFromContent(result.getContent());
         String phoneUrlStr = OlxVariables.OLX_HOST_URL + 
                                     OLX_PHONE_URL + idStr + "/?pt=" + token;
-        log.debug(classname, phoneUrlStr);
+//        log.debug(classname, phoneUrlStr);
         OlxRequest request = new OlxRequest();
         OlxResult phoneRequestResult = 
                 request.makeRequest(phoneUrlStr, urlStr, result.getCookieStore());
+        String phoneStr = phoneRequestResult.getContent();
 
-        return phoneRequestResult.getContent();
+        String startPattern = "{\"value\":\"";
+        String endPattern = "\"}";
+        return getPatternCutOut(phoneStr, startPattern, endPattern);
     }
     
     private String getTokenFromContent(String content) {
@@ -109,14 +114,9 @@ public class OlxParser {
         Matcher matcher = pattern.matcher(content);        
         if(matcher.matches() == false) return null;
         
-        String tokenStartPattern = "var phoneToken = '";
-        String tokenEndPattern = "';";
-        int tokenStartPosition = content.indexOf(tokenStartPattern) + 
-                                        tokenStartPattern.length();
-        int tokenEndPosition = content.indexOf(tokenEndPattern, 
-                                        tokenStartPosition + 1);
-
-        return content.substring(tokenStartPosition, tokenEndPosition);        
+        String startPattern = "var phoneToken = '";
+        String endPattern = "';";
+        return getPatternCutOut(content, startPattern, endPattern);        
     }
     
     private String getIDfromUrl(String url) {
@@ -133,31 +133,122 @@ public class OlxParser {
     }
     
     private String getAuthorFromContent(String content) {
-        return null;
-    }
+        String innerContent = getUserDetailsBlockFromContent(content);
+        String startPattern = "\">";
+        String endPattern = "</a>";
+        String ret = getPatternCutOut(innerContent, startPattern, endPattern);
+        if(ret != null) return ret.trim();
+        else            return ret;
+    }   
     
     private String getDescriptionFromContent(String content) {
-        return null;
+        String innerContent = getOfferDescriptionContentBlockFromContent(content);
+        String startPattern = "<p class=\"pding10 lheight20 large\">";
+        String endPattern = "</p>";
+        String ret = getPatternCutOut(innerContent, startPattern, endPattern);
+        if(ret != null) return ret.trim();
+        else            return ret;
     }
     
     private String getHeaderFromContent(String content) {
-        return null;
+        String innerContent = getOfferTitleboxBlockFromContent(content);
+        String startPattern = "<h1>";
+        String endPattern = "</h1>";
+        String ret = getPatternCutOut(innerContent, startPattern, endPattern);
+        if(ret != null) return ret.trim();
+        else            return ret;
     }
     
     private String getIdFromContent(String content) {
-        return null;
+        String innerContent = getOfferTitleboxDetailsBlockFromContent(content);
+        String startPattern = "<small>Номер объявления:";
+        String endPattern = "</small>";
+        String ret = getPatternCutOut(innerContent, startPattern, endPattern);
+        if(ret != null) return ret.trim();
+        else            return ret;
     }
     
     private String getPriceFromContent(String content) {
-        return null;
+        String innerContent = getPriceLabelBlockFromContent(content);
+        String startPattern = "<strong class=\"xxxx-large not-arranged\">";
+        String endPattern = "</strong>";
+        String ret = getPatternCutOut(innerContent, startPattern, endPattern);
+        if(ret != null) return ret.trim();
+        else            return ret;
     }
     
     private String getPublicationDateFromContent(String content) {
-        return null;
+        String innerContent = getOfferTitleboxDetailsBlockFromContent(content);
+        String startPattern = "Опубликовано с мобильного</a>";
+        String endPattern = "<small>";
+        String ret = getPatternCutOut(innerContent, startPattern, endPattern);
+        if(ret != null) return ret.trim();
+        else            return ret;
     }
     
     private String getRegionFromContent(String content) {
-        return null;
+        String innerContent = getOfferTitleboxDetailsBlockFromContent(content);
+        String startPattern = "<strong>";
+        String endPattern = "</strong>";
+        String ret = getPatternCutOut(innerContent, startPattern, endPattern);
+        if(ret != null) return ret.trim();
+        else            return ret;
+    }
+    
+    private String getUserOffersFromContent(String content) {
+        String innerContent = getUserDetailsBlockFromContent(content);
+        String startPattern = "<a href=\"";
+        String endPattern = "\">";
+        return getPatternCutOut(innerContent, startPattern, endPattern);
+    }
+    
+    private String getUserSinceFromContent(String content) {
+        String innerContent = getUserDetailsBlockFromContent(content);
+        String startPattern = "<span class=\"user-since\">на OLX с";
+        String endPattern = "</span>";
+        return getPatternCutOut(innerContent, startPattern, endPattern);
+    }
+    
+    private String getUserDetailsBlockFromContent(String content) {
+        String startPattern = "<div class=\"offer-user__details\">";
+        String endPattern = "</div>";
+        return getPatternCutOut(content, startPattern, endPattern);
+    }  
+    
+    private String getPriceLabelBlockFromContent(String content) {
+        String startPattern = "<div class=\"price-label\">";
+        String endPattern = "</div>";
+        return getPatternCutOut(content, startPattern, endPattern);
+    }
+    
+    private String getOfferDescriptionContentBlockFromContent(String content) {
+        String startPattern = "<div class=\"clr descriptioncontent marginbott20\">";
+        String endPattern = "<div id=\"offerbottombar\" class=\"pding15\">";
+        return getPatternCutOut(content, startPattern, endPattern);
+    }
+    
+    private String getOfferTitleboxBlockFromContent(String content) {
+        String startPattern = "<div class=\"offer-titlebox\">";
+        String endPattern = "<div class=\"offer-titlebox__details\">";
+        return getPatternCutOut(content, startPattern, endPattern);
+    }
+    
+    private String getOfferTitleboxDetailsBlockFromContent(String content) {
+        String startPattern = "<div class=\"offer-titlebox__details\">";
+        String endPattern = "</div>";
+        return getPatternCutOut(content, startPattern, endPattern);
+    }
+    
+    private String getPatternCutOut(String content, String startPattern, String endPattern) {
+        int startPosition = content.indexOf(startPattern) + 
+                                        startPattern.length();
+        if(startPosition == -1)
+                            return null;
+        int endPosition = content.indexOf(endPattern, 
+                                        startPosition + 1);
+        if(endPosition == -1)
+                            return null;
+        return content.substring(startPosition, endPosition);
     }
     
     public static void main(String[] args) {

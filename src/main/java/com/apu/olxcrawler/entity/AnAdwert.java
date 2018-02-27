@@ -15,11 +15,13 @@ public class AnAdwert {
     private String description;
     private String header;
     private String id;
-    private String link;
+    private String link;    
     private String phone;
     private String price;
     private String publicationDate;    
-    private String region; 
+    private String region;
+    private String userOffers;
+    private String userSince;
 
     public String getAuthor() {
         return author;
@@ -60,7 +62,7 @@ public class AnAdwert {
     public void setLink(String link) {
         this.link = link;
     }
-
+ 
     public String getPhone() {
         return phone;
     }
@@ -93,6 +95,20 @@ public class AnAdwert {
         this.region = region;
     }
     
-    
+    public String getUserOffers() {
+        return userOffers;
+    }
+
+    public void setUserOffers(String offers) {
+        this.userOffers = offers;
+    }
+
+    public String getUserSince() {
+        return userSince;
+    }
+
+    public void setUserSince(String userSince) {
+        this.userSince = userSince;
+    }
     
 }

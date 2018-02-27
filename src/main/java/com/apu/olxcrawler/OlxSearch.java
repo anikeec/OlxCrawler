@@ -5,7 +5,9 @@
  */
 package com.apu.olxcrawler;
 
+import com.apu.olxcrawler.entity.AnAdwert;
 import com.apu.olxcrawler.utils.Log;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -71,9 +73,13 @@ public class OlxSearch {
         
         OlxParser parser = new OlxParser();
         List<String> list = parser.parseSearchResult(content);
-        for(String str:list) {
-            System.out.println(str);
+        List<AnAdwert> adwertList = new ArrayList<>();
+        for(String link:list) {
+            parser = new OlxParser();
+            adwertList.add(parser.getAnAdwertFromLink(link));
+            //System.out.println(str);
         }
+        System.out.println("Ready");
     }
     
 }
