@@ -5,22 +5,14 @@
  */
 package com.apu.olxcrawler;
 
+import com.apu.olxcrawler.query.OlxRequest;
+import com.apu.olxcrawler.entity.AnAdwert;
+import com.apu.olxcrawler.query.OlxResult;
+import com.apu.olxcrawler.utils.Log;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  *
@@ -32,6 +24,27 @@ public class OlxParser {
     private final Class classname = OlxParser.class;    
         
     private final String OLX_PHONE_URL = "ajax/misc/contact/phone/";
+    
+    public AnAdwert getAnAdwertFromLink(String link) {
+        AnAdwert adwert = new AnAdwert();
+        String content = null;
+        
+        OlxRequest request = new OlxRequest();
+        OlxResult result = request.makeRequest(link);
+        content = result.getContent();
+        
+        adwert.setAuthor(getAuthorFromContent(content));
+        adwert.setDescription(getDescriptionFromContent(content));
+        adwert.setHeader(getHeaderFromContent(content));
+        adwert.setId(getIdFromContent(content));
+        adwert.setLink(link);        
+        adwert.setPrice(getPriceFromContent(content));
+        adwert.setPublicationDate(getPublicationDateFromContent(content));
+        adwert.setRegion(getRegionFromContent(content));
+        adwert.setPhone(getPhoneFromUrlAndResult(link, result));
+        
+        return adwert;
+    }
     
     public List<String> parseSearchResult(String content) {
         List<String> list = new ArrayList<>();
@@ -46,7 +59,7 @@ public class OlxParser {
             Pointer position = new Pointer();
             String lastLink = "";
             while(true) {
-                String link = getLinkFromContent(contentTemp, position);
+                String link = getLinkFromSearchResultContent(contentTemp, position);
                 if(link == null)
                         break;
                 if(link.equals(lastLink)) 
@@ -58,7 +71,7 @@ public class OlxParser {
         return list;
     }
     
-    private String getLinkFromContent(String content, Pointer startPosition) {        
+    private String getLinkFromSearchResultContent(String content, Pointer startPosition) {        
         String linkStartPattern = "https://www.olx.ua/obyavlenie/";
         String linkEndPattern = "\"";
         int linkStartPosition = content.indexOf(linkStartPattern, 
@@ -73,69 +86,20 @@ public class OlxParser {
         return content.substring(linkStartPosition, linkEndPosition);
     }
     
-    String requestPhoneFromUrl(String urlStr) {
-        String phoneResult = null;
-        
+    String getPhoneFromUrlAndResult(String urlStr, OlxResult result) {      
         String idStr = this.getIDfromUrl(urlStr);
         if(idStr == null)   
                 return null;
         
-        String content;
-        List<Cookie> cookies = null;
-        
-        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
-            HttpGet request = new HttpGet(urlStr);
-            HttpClientContext context = HttpClientContext.create();
-
-            try (CloseableHttpResponse response = httpClient.execute(request, context)) {
-                CookieStore cookieStore = context.getCookieStore();
-                cookies = cookieStore.getCookies();
-                HttpEntity entity = response.getEntity();
-                content = EntityUtils.toString(entity);
-            }            
-        } catch (Exception ex) {
-            log.debug(classname, ExceptionUtils.getStackTrace(ex));
-            return null;
-        } 
-        
-        BasicCookieStore cookieStore = new BasicCookieStore();
-        for(Cookie cookie:cookies) {
-            cookieStore.addCookie(cookie);
-        }
-        
-        try (CloseableHttpClient httpClient = HttpClientBuilder
-                    .create().setDefaultCookieStore(cookieStore).build()) {
-            
-            String token = getTokenFromContent(content);
-            if(token == null)   
-                    return null;
-            
-            String requestPhoneNumber = OlxVariables.OLX_HOST_URL + 
+        String token = getTokenFromContent(result.getContent());
+        String phoneUrlStr = OlxVariables.OLX_HOST_URL + 
                                     OLX_PHONE_URL + idStr + "/?pt=" + token;
-            log.debug(classname, requestPhoneNumber);
-            
-            HttpGet request = new HttpGet(requestPhoneNumber);
-            request.addHeader(HttpHeaders.HOST, "www.olx.ua");
-            request.addHeader(HttpHeaders.REFERER, urlStr);
-            request.addHeader(HttpHeaders.ACCEPT, "text/html,application/xhtml+xml,"
-                    + "application/xml;q=0.9,image/webp,image/apng,*/*");
-            request.addHeader(HttpHeaders.ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
-            request.addHeader(HttpHeaders.ACCEPT_ENCODING, "Accept-Encoding: gzip, deflate, br");
-            request.addHeader(HttpHeaders.CONNECTION, "keep-alive");
-            request.addHeader("X-Requested-With", "XMLHttpRequest");
-            request.addHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 6.1; Win64; x64) "
-                    + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36");
-            
-            try (CloseableHttpResponse response = httpClient.execute(request)) {                
-                HttpEntity entity = response.getEntity();
-                phoneResult = EntityUtils.toString(entity);            
-            } 
-        } catch (Exception ex) {
-            log.debug(classname, ExceptionUtils.getStackTrace(ex));
-            return null;
-        }
-        
-        return phoneResult;
+        log.debug(classname, phoneUrlStr);
+        OlxRequest request = new OlxRequest();
+        OlxResult phoneRequestResult = 
+                request.makeRequest(phoneUrlStr, urlStr, result.getCookieStore());
+
+        return phoneRequestResult.getContent();
     }
     
     private String getTokenFromContent(String content) {
@@ -168,16 +132,42 @@ public class OlxParser {
         return url.substring(startPosition, endPosition);
     }
     
+    private String getAuthorFromContent(String content) {
+        return null;
+    }
+    
+    private String getDescriptionFromContent(String content) {
+        return null;
+    }
+    
+    private String getHeaderFromContent(String content) {
+        return null;
+    }
+    
+    private String getIdFromContent(String content) {
+        return null;
+    }
+    
+    private String getPriceFromContent(String content) {
+        return null;
+    }
+    
+    private String getPublicationDateFromContent(String content) {
+        return null;
+    }
+    
+    private String getRegionFromContent(String content) {
+        return null;
+    }
+    
     public static void main(String[] args) {
         String urlStr = "https://www.olx.ua/obyavlenie/learn-version-control-with-"
             + "git-raspredelennaya-sistema-upravleniya-vers-IDya9jS.html#5b61bf5b91";
+        
         OlxParser parser = new OlxParser();
-        
-        String idStr = parser.getIDfromUrl(urlStr);
-        System.out.println(idStr);
-        
-        String phoneStr = parser.requestPhoneFromUrl(urlStr);
-        System.out.println(phoneStr);
+
+        AnAdwert anAdwert = parser.getAnAdwertFromLink(urlStr);
+        System.out.println(anAdwert.getPhone());
     }
     
 }

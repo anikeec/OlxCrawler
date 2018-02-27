@@ -5,6 +5,7 @@
  */
 package com.apu.olxcrawler;
 
+import com.apu.olxcrawler.utils.Log;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.exception.ExceptionUtils;
