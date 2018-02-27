@@ -29,14 +29,27 @@ public class OlxSearch {
     
     private final String OLX_SEARCH_URL = "list/q-";
     
-    public String find(String searchStr) {
+    public List<String> find(String searchStr) {
         try {
             String searchStrEncoded = URLEncoder.encode(searchStr, "utf-8");
             searchStrEncoded = OlxVariables.OLX_HOST_URL +
                     OLX_SEARCH_URL +
                     formatSearchStr(searchStrEncoded) +
                     "/";
-            return getRequest(searchStrEncoded);
+            
+            OlxParser parser = new OlxParser();
+            String searchContent = getRequest(searchStrEncoded);
+            
+            Integer amountOfPages = parser.getAmountOfPagesFromContent(searchContent);
+            List<String> list = parser.parseSearchResultOnePage(searchContent);
+            if(amountOfPages != null) {
+                for(int i=2; i<(amountOfPages + 1); i++) {
+                    String link = searchStrEncoded + "?page=" + i;
+                    searchContent = getRequest(link);
+                    list.addAll(parser.parseSearchResultOnePage(searchContent));
+                }
+            }            
+            return list;
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(OlxSearch.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -58,10 +71,8 @@ public class OlxSearch {
     
     public static void main(String[] args) throws InterruptedException {
         OlxSearch olxSearch = new OlxSearch();
-        String content = olxSearch.find("Операционные  системы");
+        List<String> list = olxSearch.find("системный блок новый");        
         
-        OlxParser parser = new OlxParser();
-        List<String> list = parser.parseSearchResult(content);
         List<AnAdwert> adwertList = new ArrayList<>();
         
         int QUEUE_SIZE = 50;

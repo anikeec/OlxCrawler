@@ -48,7 +48,7 @@ public class OlxParser {
         return adwert;
     }
     
-    public List<String> parseSearchResult(String content) {
+    public List<String> parseSearchResultOnePage(String content) {
         List<String> list = new ArrayList<>();
         String regExpUrl = "https://www.olx.ua/obyavlenie/(.+)\" class=\"marginright5 link linkWithHash detailsLink\"";
         Pattern pattern = Pattern.compile(regExpUrl, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);        
@@ -235,6 +235,43 @@ public class OlxParser {
     
     private String getOfferTitleboxDetailsBlockFromContent(String content) {
         String startPattern = "<div class=\"offer-titlebox__details\">";
+        String endPattern = "</div>";
+        return getPatternCutOut(content, startPattern, endPattern);
+    }
+    
+    public Integer getAmountOfPagesFromContent(String content) {
+        String innerContent = getPagesBlockFromContent(content);
+        
+        Pointer ptr = new Pointer();
+        while(true) {
+            String tempContent = getNextPageIndex(innerContent, ptr);
+            if(tempContent == null) {              
+                break;
+            } 
+            innerContent = tempContent;
+        }
+        
+        String startPattern = "<span>";
+        String endPattern = "</span>";
+        String amount = getPatternCutOut(innerContent, startPattern, endPattern);
+        if(amount != null) {
+            amount = amount.trim();
+            return Integer.parseInt(amount);
+        }
+        return null;
+    }
+    
+    private String getNextPageIndex(String content, Pointer ptr) {
+        String startPattern = "<span class=\"item fleft\">";
+        int startPosition = content.indexOf(startPattern);
+        if(startPosition == -1)
+                            return null;
+//        ptr.set(startPosition);
+        return content.substring(startPosition + startPattern.length());
+    }
+    
+    private String getPagesBlockFromContent(String content) {
+        String startPattern = "<div class=\"pager rel clr\">";
         String endPattern = "</div>";
         return getPatternCutOut(content, startPattern, endPattern);
     }
