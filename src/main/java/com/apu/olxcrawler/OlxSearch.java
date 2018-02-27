@@ -9,6 +9,8 @@ import com.apu.olxcrawler.entity.AnAdwert;
 import com.apu.olxcrawler.utils.Log;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpEntity;
@@ -27,7 +29,7 @@ import org.apache.http.util.EntityUtils;
 public class OlxSearch {
     
     private static final Log log = Log.getInstance();
-    private final Class classname = OlxSearch.class;
+    private static final Class classname = OlxSearch.class;
     
     private final String OLX_SEARCH_URL = "list/q-";
     
@@ -61,24 +63,50 @@ public class OlxSearch {
                     content = EntityUtils.toString(entity);
                 }            
             } catch (Exception ex) {
-                log.debug(classname, ExceptionUtils.getStackTrace(ex));
+                log.error(classname, ExceptionUtils.getStackTrace(ex));
                 return null;
             }
         return content;
     }
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         OlxSearch olxSearch = new OlxSearch();
         String content = olxSearch.find("Операционные  системы");
         
         OlxParser parser = new OlxParser();
         List<String> list = parser.parseSearchResult(content);
         List<AnAdwert> adwertList = new ArrayList<>();
+        
+        int QUEUE_SIZE = 50;
+        
+        BlockingQueue<String> inputLinkQueue = 
+                                    new ArrayBlockingQueue<>(QUEUE_SIZE);
+        BlockingQueue<AnAdwert> outputAnAdwertQueue = 
+                                    new ArrayBlockingQueue<>(QUEUE_SIZE);
+        
+        OlxParsersPool parserPool = 
+                    new OlxParsersPool(inputLinkQueue, outputAnAdwertQueue);
+        parserPool.init();
+        
+        log.error(classname, "Start");
+        
         for(String link:list) {
-            parser = new OlxParser();
-            adwertList.add(parser.getAnAdwertFromLink(link));
+//            parser = new OlxParser();
+//            adwertList.add(parser.getAnAdwertFromLink(link));
+            inputLinkQueue.put(link);
             //System.out.println(str);
         }
+        
+        int counter = 0;
+        while(true) {
+            adwertList.add(outputAnAdwertQueue.take());
+            counter++;
+            if(counter >= list.size())
+                break;
+        }
+        
+        log.error(classname, "Finish");
+        
         System.out.println("Ready");
     }
     

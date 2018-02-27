@@ -44,7 +44,7 @@ public class OlxRequest {
                 content = EntityUtils.toString(entity);
             }            
         } catch (Exception ex) {
-            log.debug(classname, ExceptionUtils.getStackTrace(ex));
+            log.error(classname, ExceptionUtils.getStackTrace(ex));
             return null;
         } 
         
@@ -62,7 +62,7 @@ public class OlxRequest {
         try (CloseableHttpClient httpClient = HttpClientBuilder
                     .create().setDefaultCookieStore(cookieStore).build()) {
 
-            log.debug(classname, urlStr);
+            log.error(classname, urlStr);
             
             HttpGet request = new HttpGet(urlStr);
             request.addHeader(HttpHeaders.HOST, "www.olx.ua");
@@ -81,9 +81,11 @@ public class OlxRequest {
                 content = EntityUtils.toString(entity);            
             } 
         } catch (Exception ex) {
-            log.debug(classname, ExceptionUtils.getStackTrace(ex));
+            log.error(classname, ExceptionUtils.getStackTrace(ex));
             return null;
         }
+        
+        log.error(classname, "get results");
         
         return new OlxResult(content, cookieStore);
     }
