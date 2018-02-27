@@ -24,8 +24,12 @@ public class OlxRequest {
     private static final Log log = Log.getInstance();
     private final Class classname = OlxRequest.class;
     
+    private final ConnectionManager connectionManager = 
+                            ConnectionManager.getInstance();
+    
     public OlxResult makeRequest(String urlStr) {
-        HttpClient client = ConnectionManager.getInstance().getClient();
+        HttpClientItem httpClientItem = connectionManager.getClient();
+        HttpClient client = httpClientItem.getHttpClient();
         client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
         GetMethod request = new GetMethod(urlStr);
         
@@ -39,7 +43,9 @@ public class OlxRequest {
             request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
             request.setRequestHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 6.1; Win64; x64) "
                     + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36");
+            log.error(classname, Thread.currentThread().getName() + " send request");
             client.executeMethod(request);
+            log.error(classname, Thread.currentThread().getName() + " get responce");
             String responseBody = request.getResponseBodyAsString();
             Cookie[] cookies = client.getState().getCookies();
 
@@ -48,12 +54,14 @@ public class OlxRequest {
             log.error(classname, ExceptionUtils.getStackTrace(ex));
         } finally {
             request.releaseConnection();
+            connectionManager.putClient(httpClientItem);
         }
         return null;
     }
     
     public OlxResult makeRequest(String urlStr, String refererUrlStr, Cookie[] cookies) {
-        HttpClient client = ConnectionManager.getInstance().getClient();
+        HttpClientItem httpClientItem = connectionManager.getClient();
+        HttpClient client = httpClientItem.getHttpClient();
         client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
         GetMethod request = new GetMethod(urlStr);
         
@@ -71,7 +79,9 @@ public class OlxRequest {
             request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
             request.setRequestHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 6.1; Win64; x64) "
                     + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36");
+            log.error(classname, Thread.currentThread().getName() + " send request");
             client.executeMethod(request);
+            log.error(classname, Thread.currentThread().getName() + " get responce");
             String responseBody = request.getResponseBodyAsString();
             Cookie[] cookiesRet = client.getState().getCookies();
             return new OlxResult(responseBody, cookiesRet);
@@ -79,6 +89,7 @@ public class OlxRequest {
             log.error(classname, ExceptionUtils.getStackTrace(ex));
         } finally {
             request.releaseConnection();
+            connectionManager.putClient(httpClientItem);
         }
         return null;
     }

@@ -33,8 +33,10 @@ public class OlxParserThread implements Runnable {
         parser = new OlxParser();
         while(Thread.currentThread().isInterrupted() == false) {
             try {
-                String link = inputLinkQueue.take();                
+                String link = inputLinkQueue.take();
+                log.error(classname, Thread.currentThread().getName() + " take link.");
                 AnAdwert adwert = parser.getAnAdwertFromLink(link);
+                log.error(classname, Thread.currentThread().getName() + " put adwert.");
                 outputAnAdwertQueue.put(adwert);
             } catch (InterruptedException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));
