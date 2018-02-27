@@ -5,7 +5,7 @@
  */
 package com.apu.olxcrawler.query;
 
-import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.commons.httpclient.Cookie;
 
 /**
  *
@@ -13,20 +13,19 @@ import org.apache.http.impl.client.BasicCookieStore;
  */
 public class OlxResult {
     private String content;
-    private BasicCookieStore cookieStore;
+    private Cookie[] cookies;
 
-    public OlxResult(String content, BasicCookieStore cookieStore) {
+    public OlxResult(String content, Cookie[] cookies) {
         this.content = content;
-        this.cookieStore = cookieStore;
-    }
+        this.cookies = cookies;
+    } 
 
     public String getContent() {
         return content;
     }
 
-    public BasicCookieStore getCookieStore() {
-        return cookieStore;
-    }
-    
+    public Cookie[] getCookies() {
+        return cookies;
+    }    
     
 }

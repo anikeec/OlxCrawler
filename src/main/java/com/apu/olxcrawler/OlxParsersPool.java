@@ -6,6 +6,7 @@
 package com.apu.olxcrawler;
 
 import com.apu.olxcrawler.entity.AnAdwert;
+import com.apu.olxcrawler.query.ConnectionManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -16,7 +17,6 @@ import java.util.concurrent.BlockingQueue;
  */
 public class OlxParsersPool {
     
-    private final int THREAD_POOL_SIZE = 20;    
     private List<Thread> threadList = new ArrayList<>();
     private final BlockingQueue<String> inputLinkQueue;
     private final BlockingQueue<AnAdwert> outputAnAdwertQueue;
@@ -30,7 +30,7 @@ public class OlxParsersPool {
     public void init() {
         OlxParserThread olxThread;
         Thread thread;
-        for(int i=0; i<THREAD_POOL_SIZE; i++) {
+        for(int i=0; i<ConnectionManager.MAX_CONNECTION_PER_HOST; i++) {
             olxThread = new OlxParserThread(inputLinkQueue, outputAnAdwertQueue);
             thread = new Thread(olxThread);
             thread.setDaemon(true);

@@ -99,7 +99,7 @@ public class OlxParser {
 //        log.debug(classname, phoneUrlStr);
         OlxRequest request = new OlxRequest();
         OlxResult phoneRequestResult = 
-                request.makeRequest(phoneUrlStr, urlStr, result.getCookieStore());
+                request.makeRequest(phoneUrlStr, urlStr, result.getCookies());
         String phoneStr = phoneRequestResult.getContent();
 
         String startPattern = "{\"value\":\"";

@@ -6,21 +6,17 @@
 package com.apu.olxcrawler;
 
 import com.apu.olxcrawler.entity.AnAdwert;
+import com.apu.olxcrawler.query.OlxRequest;
 import com.apu.olxcrawler.utils.Log;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 
 /**
  *
@@ -34,11 +30,17 @@ public class OlxSearch {
     private final String OLX_SEARCH_URL = "list/q-";
     
     public String find(String searchStr) {
-        searchStr = OlxVariables.OLX_HOST_URL +
-                            OLX_SEARCH_URL +
-                            formatSearchStr(searchStr) +
-                            "/";
-        return getRequest(searchStr);
+        try {
+            String searchStrEncoded = URLEncoder.encode(searchStr, "utf-8");
+            searchStrEncoded = OlxVariables.OLX_HOST_URL +
+                    OLX_SEARCH_URL +
+                    formatSearchStr(searchStrEncoded) +
+                    "/";
+            return getRequest(searchStrEncoded);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(OlxSearch.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
     
     public String find(String searchStr, String region) throws Exception {
@@ -50,23 +52,8 @@ public class OlxSearch {
         return CLEAR_PATTERN.matcher(searchStr).replaceAll("-").trim();
     }
     
-    private String getRequest(String queryStr) {
-        String content;
-        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
-                HttpGet request = new HttpGet(queryStr);
-                HttpClientContext context = HttpClientContext.create();
-
-                try (CloseableHttpResponse response = httpClient.execute(request, context)) {
-                    CookieStore cookieStore = context.getCookieStore();
-    //                cookies = cookieStore.getCookies();
-                    HttpEntity entity = response.getEntity();
-                    content = EntityUtils.toString(entity);
-                }            
-            } catch (Exception ex) {
-                log.error(classname, ExceptionUtils.getStackTrace(ex));
-                return null;
-            }
-        return content;
+    private String getRequest(String queryStr) {         
+        return new OlxRequest().makeRequest(queryStr).getContent();
     }
     
     public static void main(String[] args) throws InterruptedException {
@@ -91,10 +78,7 @@ public class OlxSearch {
         log.error(classname, "Start");
         
         for(String link:list) {
-//            parser = new OlxParser();
-//            adwertList.add(parser.getAnAdwertFromLink(link));
             inputLinkQueue.put(link);
-            //System.out.println(str);
         }
         
         int counter = 0;
