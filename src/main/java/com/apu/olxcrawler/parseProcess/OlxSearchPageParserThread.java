@@ -5,6 +5,7 @@
  */
 package com.apu.olxcrawler.parseProcess;
 
+import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.parser.OlxSearchParser;
 import com.apu.olxcrawler.query.OlxRequest;
 import com.apu.olxcrawler.utils.Log;
@@ -21,10 +22,10 @@ public class OlxSearchPageParserThread implements Runnable {
     private static final Log log = Log.getInstance();
     private final Class classname = OlxSearchPageParserThread.class;
 
-    private final BlockingQueue<String> inputLinkQueue;
+    private final BlockingQueue<ExpandedLink> inputLinkQueue;
     private final BlockingQueue<SearchPageQuery> outputSearchPageQueue;
 
-    public OlxSearchPageParserThread(BlockingQueue<String> inputLinkQueue, 
+    public OlxSearchPageParserThread(BlockingQueue<ExpandedLink> inputLinkQueue, 
                                 BlockingQueue<SearchPageQuery> outputSearchPageQueue) {
         this.inputLinkQueue = inputLinkQueue;
         this.outputSearchPageQueue = outputSearchPageQueue;
@@ -36,16 +37,18 @@ public class OlxSearchPageParserThread implements Runnable {
         parser = new OlxSearchParser();
         while(Thread.currentThread().isInterrupted() == false) {
             try {
-                String searchPageLink = inputLinkQueue.take();
+                ExpandedLink searchPageLink = inputLinkQueue.take();
                 log.error(classname, Thread.currentThread().getName() + " take link.");
                 
                 String content = 
-                        new OlxRequest().makeRequest(searchPageLink).getContent();
+                        new OlxRequest().makeRequest(searchPageLink.getLink()).getContent();
                 
                 List<String> linkList = parser.parseSearchResultOnePage(content);
                 
                 SearchPageQuery searchResult = 
-                        new SearchPageQuery(searchPageLink, linkList);
+                        new SearchPageQuery(searchPageLink.getLink(), 
+                                            linkList,
+                                            searchPageLink.getInitQuery());
                 
                 log.error(classname, Thread.currentThread().getName() + " put result links.");                
                 outputSearchPageQueue.put(searchResult);

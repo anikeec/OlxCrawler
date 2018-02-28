@@ -7,6 +7,7 @@ package com.apu.olxcrawler.parseProcess;
 
 import com.apu.olxcrawler.parser.OlxAnAdvertParser;
 import com.apu.olxcrawler.entity.AnAdvert;
+import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.utils.Log;
 import java.util.concurrent.BlockingQueue;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -20,10 +21,10 @@ public class OlxAnAdvertParserThread implements Runnable {
     private static final Log log = Log.getInstance();
     private final Class classname = OlxAnAdvertParserThread.class;
 
-    private final BlockingQueue<String> inputLinkQueue;
+    private final BlockingQueue<ExpandedLink> inputLinkQueue;
     private final BlockingQueue<AnAdvert> outputAnAdvertQueue;
 
-    public OlxAnAdvertParserThread(BlockingQueue<String> inputLinkQueue, BlockingQueue<AnAdvert> outputAnAdvertQueue) {
+    public OlxAnAdvertParserThread(BlockingQueue<ExpandedLink> inputLinkQueue, BlockingQueue<AnAdvert> outputAnAdvertQueue) {
         this.inputLinkQueue = inputLinkQueue;
         this.outputAnAdvertQueue = outputAnAdvertQueue;
     }
@@ -34,7 +35,7 @@ public class OlxAnAdvertParserThread implements Runnable {
         parser = new OlxAnAdvertParser();
         while(Thread.currentThread().isInterrupted() == false) {
             try {
-                String link = inputLinkQueue.take();
+                ExpandedLink link = inputLinkQueue.take();
                 log.error(classname, Thread.currentThread().getName() + " take link.");
                 AnAdvert advert = parser.getAnAdvertFromLink(link);
                 log.error(classname, Thread.currentThread().getName() + " put advert.");

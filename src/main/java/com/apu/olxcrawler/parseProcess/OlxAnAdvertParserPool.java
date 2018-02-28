@@ -6,6 +6,7 @@
 package com.apu.olxcrawler.parseProcess;
 
 import com.apu.olxcrawler.entity.AnAdvert;
+import com.apu.olxcrawler.entity.ExpandedLink;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -19,10 +20,10 @@ public class OlxAnAdvertParserPool {
     private static final int THREAD_POOL_SIZE = 5;
     
     private final List<Thread> threadList;
-    private final BlockingQueue<String> inputLinkQueue;
+    private final BlockingQueue<ExpandedLink> inputLinkQueue;
     private final BlockingQueue<AnAdvert> outputAnAdvertQueue;
 
-    public OlxAnAdvertParserPool(BlockingQueue<String> inputLinkQueue, 
+    public OlxAnAdvertParserPool(BlockingQueue<ExpandedLink> inputLinkQueue, 
                             BlockingQueue<AnAdvert> outputAnAdvertQueue) {
         this.threadList = new ArrayList<>();
         this.inputLinkQueue = inputLinkQueue;

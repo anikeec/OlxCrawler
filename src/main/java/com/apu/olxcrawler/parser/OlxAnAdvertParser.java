@@ -8,6 +8,7 @@ package com.apu.olxcrawler.parser;
 import com.apu.olxcrawler.OlxVariables;
 import com.apu.olxcrawler.query.OlxRequest;
 import com.apu.olxcrawler.entity.AnAdvert;
+import com.apu.olxcrawler.entity.ExpandedLink;
 import static com.apu.olxcrawler.parser.OlxParserUtils.getPatternCutOut;
 import com.apu.olxcrawler.query.OlxResult;
 import com.apu.olxcrawler.utils.Log;
@@ -25,25 +26,26 @@ public class OlxAnAdvertParser {
         
     private final String OLX_PHONE_URL = "ajax/misc/contact/phone/";
     
-    public AnAdvert getAnAdvertFromLink(String link) {
+    public AnAdvert getAnAdvertFromLink(ExpandedLink link) {
         AnAdvert advert = new AnAdvert();
         String content;
         
         OlxRequest request = new OlxRequest();
-        OlxResult result = request.makeRequest(link);
+        OlxResult result = request.makeRequest(link.getLink());
         content = result.getContent();
         
         advert.setAuthor(getAuthorFromContent(content));
         advert.setDescription(getDescriptionFromContent(content));
         advert.setHeader(getHeaderFromContent(content));
         advert.setId(getIdFromContent(content));
-        advert.setLink(link);        
+        advert.setLink(link.getLink());        
         advert.setPrice(getPriceFromContent(content));
         advert.setPublicationDate(getPublicationDateFromContent(content));
         advert.setRegion(getRegionFromContent(content));
-        advert.setPhone(getPhoneFromUrlAndResult(link, result));
+        advert.setPhone(getPhoneFromUrlAndResult(link.getLink(), result));
         advert.setUserOffers(getUserOffersFromContent(content));
         advert.setUserSince(getUserSinceFromContent(content));
+        advert.setInitQuery(link.getInitQuery());
         
         return advert;
     }
@@ -211,8 +213,8 @@ public class OlxAnAdvertParser {
         
         OlxAnAdvertParser parser = new OlxAnAdvertParser();
 
-        AnAdvert anAdvert = parser.getAnAdvertFromLink(urlStr);
-        System.out.println(anAdvert.getPhone());
+//        AnAdvert anAdvert = parser.getAnAdvertFromLink(urlStr);
+//        System.out.println(anAdvert.getPhone());
     }
     
 }

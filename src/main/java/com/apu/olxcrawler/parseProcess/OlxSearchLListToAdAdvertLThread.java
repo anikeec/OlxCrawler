@@ -5,6 +5,7 @@
  */
 package com.apu.olxcrawler.parseProcess;
 
+import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.utils.Log;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -20,11 +21,11 @@ public class OlxSearchLListToAdAdvertLThread implements Runnable {
     private final Class classname = OlxSearchLListToAdAdvertLThread.class;
 
     private final BlockingQueue<SearchPageQuery> inputSearchPageQueue;
-    private final BlockingQueue<String> outputLinkQueue;
+    private final BlockingQueue<ExpandedLink> outputLinkQueue;
 
     public OlxSearchLListToAdAdvertLThread(
                             BlockingQueue<SearchPageQuery> inputSearchPageQueue, 
-                            BlockingQueue<String> outputLinkQueue) {
+                            BlockingQueue<ExpandedLink> outputLinkQueue) {
         this.inputSearchPageQueue = inputSearchPageQueue;
         this.outputLinkQueue = outputLinkQueue;
     }
@@ -37,7 +38,7 @@ public class OlxSearchLListToAdAdvertLThread implements Runnable {
                 spQuery = inputSearchPageQueue.take();
                 List<String> linkList = spQuery.getLinkList();
                 for(String link:linkList) {
-                    outputLinkQueue.put(link);
+                    outputLinkQueue.put(new ExpandedLink(link, spQuery.getInitQuery()));
                 }
             } catch (InterruptedException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));

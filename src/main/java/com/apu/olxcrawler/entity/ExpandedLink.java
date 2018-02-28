@@ -3,26 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.apu.olxcrawler.parseProcess;
-
-import java.util.List;
+package com.apu.olxcrawler.entity;
 
 /**
  *
  * @author apu
  */
-public class SearchPageQuery {
+public class ExpandedLink {
     private String link;
-    private List<String> linkList;
     private String initQuery;
 
-//    public SearchPageQuery(String link, List<String> linkList) {
-//        this(link, linkList, null);
-//    }
-
-    public SearchPageQuery(String link, List<String> linkList, String initQuery) {
+    public ExpandedLink(String link, String initQuery) {
         this.link = link;
-        this.linkList = linkList;
         this.initQuery = initQuery;
     }
 
@@ -30,12 +22,10 @@ public class SearchPageQuery {
         return link;
     }
 
-    public List<String> getLinkList() {
-        return linkList;
-    }
-
     public String getInitQuery() {
         return initQuery;
     }
+    
+    
     
 }

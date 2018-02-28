@@ -6,6 +6,7 @@
 package com.apu.olxcrawler;
 
 import com.apu.olxcrawler.entity.AnAdvert;
+import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.parseProcess.OlxAnAdvertParserPool;
 import com.apu.olxcrawler.parseProcess.OlxSearchLListToAdAdvertLThread;
 import com.apu.olxcrawler.parseProcess.OlxSearchPageParserPool;
@@ -35,11 +36,11 @@ public class Crawler {
     int PARSER_INPUT_LINK_QUEUE_SIZE = 1000;
     int PARSER_OUTPUT_ANADVERT_QUEUE_SIZE = 1000; 
     
-    BlockingQueue<String> searchInputLinkQueue;
+    BlockingQueue<ExpandedLink> searchInputLinkQueue;
     BlockingQueue<SearchPageQuery> outputSearchPageQueue;
     OlxSearchPageParserPool searchPagePool;
     
-    BlockingQueue<String> inputLinkQueue;
+    BlockingQueue<ExpandedLink> inputLinkQueue;
     BlockingQueue<AnAdvert> outputAnAdvertQueue;        
     OlxAnAdvertParserPool parserPool;
 
@@ -76,12 +77,12 @@ public class Crawler {
         
         OlxSearch olxSearch = new OlxSearch();
         
-        List<String> searchPagesLinkList = 
+        List<ExpandedLink> searchPagesLinkList = 
                             olxSearch.getLinkListBySearchQuery(strToFind);
         
         log.error(classname, "Start");
         
-        for(String link:searchPagesLinkList) {
+        for(ExpandedLink link:searchPagesLinkList) {
             try {
                 searchInputLinkQueue.put(link);
             } catch (InterruptedException ex) {

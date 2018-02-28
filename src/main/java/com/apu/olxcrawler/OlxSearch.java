@@ -5,6 +5,7 @@
  */
 package com.apu.olxcrawler;
 
+import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.parser.OlxSearchParser;
 import com.apu.olxcrawler.query.OlxRequest;
 import com.apu.olxcrawler.utils.Log;
@@ -26,31 +27,31 @@ public class OlxSearch {
     
     private final String OLX_SEARCH_URL = "list/q-";
     
-    public List<String> getLinkListBySearchQuery(String searchStr) {
+    public List<ExpandedLink> getLinkListBySearchQuery(String searchStr) {
         try {
             String searchStrEncoded = URLEncoder.encode(searchStr, "utf-8");
             searchStrEncoded = OlxVariables.OLX_HOST_URL +
                     OLX_SEARCH_URL +
                     formatSearchStr(searchStrEncoded) +
                     "/";
-            return getLinkListBySearchPageLink(searchStrEncoded);
+            return getLinkListBySearchPageLink(searchStrEncoded, searchStr);
         } catch (UnsupportedEncodingException ex) {
             log.error(classname, ExceptionUtils.getStackTrace(ex));
         }
         return null;
     }
     
-    private List<String> getLinkListBySearchPageLink(String link) {
+    private List<ExpandedLink> getLinkListBySearchPageLink(String link, String searchStr) {
         OlxSearchParser searchParser = new OlxSearchParser();
         String searchContent = getRequest(link);
         Integer amountOfPages = 
                 searchParser.getAmountOfPagesFromContent(searchContent);
-        List<String> list = new ArrayList<>();
-        list.add(link);
+        List<ExpandedLink> list = new ArrayList<>();
+        list.add(new ExpandedLink(link, searchStr));
         if(amountOfPages != null) {
             for(int i=2; i<(amountOfPages + 1); i++) {
                 String resultLink = link + "?page=" + i;
-                list.add(resultLink);
+                list.add(new ExpandedLink(resultLink, searchStr));
             }
         }
         return list;

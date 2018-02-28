@@ -22,6 +22,7 @@ public class AnAdvert {
     private String region;
     private String userOffers;
     private String userSince;
+    private String initQuery;
 
     public String getAuthor() {
         return author;
@@ -109,6 +110,14 @@ public class AnAdvert {
 
     public void setUserSince(String userSince) {
         this.userSince = userSince;
+    }
+
+    public String getInitQuery() {
+        return initQuery;
+    }
+
+    public void setInitQuery(String initQuery) {
+        this.initQuery = initQuery;
     }
     
 }
