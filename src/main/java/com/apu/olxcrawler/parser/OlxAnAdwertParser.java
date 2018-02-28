@@ -144,7 +144,13 @@ public class OlxAnAdwertParser {
         String endPattern = "<small>";
         String ret = getPatternCutOut(innerContent, startPattern, endPattern);
         if(ret != null) return ret.trim();
-        else            return ret;
+        
+        startPattern = "Добавлено:";
+        endPattern = "<small>";
+        ret = getPatternCutOut(innerContent, startPattern, endPattern);
+        if(ret != null) return ret.trim();
+  
+        return null;
     }
     
     private String getRegionFromContent(String content) {
