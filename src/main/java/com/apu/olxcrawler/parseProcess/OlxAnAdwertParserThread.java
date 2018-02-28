@@ -15,15 +15,15 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  *
  * @author apu
  */
-public class OlxParserThread implements Runnable {
+public class OlxAnAdwertParserThread implements Runnable {
     
     private static final Log log = Log.getInstance();
-    private final Class classname = OlxParserThread.class;
+    private final Class classname = OlxAnAdwertParserThread.class;
 
     private final BlockingQueue<String> inputLinkQueue;
     private final BlockingQueue<AnAdwert> outputAnAdwertQueue;
 
-    public OlxParserThread(BlockingQueue<String> inputLinkQueue, BlockingQueue<AnAdwert> outputAnAdwertQueue) {
+    public OlxAnAdwertParserThread(BlockingQueue<String> inputLinkQueue, BlockingQueue<AnAdwert> outputAnAdwertQueue) {
         this.inputLinkQueue = inputLinkQueue;
         this.outputAnAdwertQueue = outputAnAdwertQueue;
     }

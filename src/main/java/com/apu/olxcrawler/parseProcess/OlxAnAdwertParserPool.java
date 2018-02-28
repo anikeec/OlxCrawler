@@ -15,7 +15,7 @@ import java.util.concurrent.BlockingQueue;
  *
  * @author apu
  */
-public class OlxParsersPool {    
+public class OlxAnAdwertParserPool {    
     
     private static final int THREAD_POOL_SIZE = 40;
     
@@ -23,7 +23,7 @@ public class OlxParsersPool {
     private final BlockingQueue<String> inputLinkQueue;
     private final BlockingQueue<AnAdwert> outputAnAdwertQueue;
 
-    public OlxParsersPool(BlockingQueue<String> inputLinkQueue, 
+    public OlxAnAdwertParserPool(BlockingQueue<String> inputLinkQueue, 
                             BlockingQueue<AnAdwert> outputAnAdwertQueue) {
         this.threadList = new ArrayList<>();
         this.inputLinkQueue = inputLinkQueue;
@@ -31,10 +31,10 @@ public class OlxParsersPool {
     }
     
     public void init() {
-        OlxParserThread olxThread;
+        OlxAnAdwertParserThread olxThread;
         Thread thread;
         for(int i=0; i<THREAD_POOL_SIZE; i++) {
-            olxThread = new OlxParserThread(inputLinkQueue, outputAnAdwertQueue);
+            olxThread = new OlxAnAdwertParserThread(inputLinkQueue, outputAnAdwertQueue);
             thread = new Thread(olxThread);
             thread.setDaemon(true);
             threadList.add(thread);

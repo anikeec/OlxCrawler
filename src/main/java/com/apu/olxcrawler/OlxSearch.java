@@ -7,7 +7,7 @@ package com.apu.olxcrawler;
 
 import com.apu.olxcrawler.parser.OlxAnAdwertParser;
 import com.apu.olxcrawler.parser.OlxSearchParser;
-import com.apu.olxcrawler.parseProcess.OlxParsersPool;
+import com.apu.olxcrawler.parseProcess.OlxAnAdwertParserPool;
 import com.apu.olxcrawler.entity.AnAdwert;
 import com.apu.olxcrawler.query.OlxRequest;
 import com.apu.olxcrawler.utils.Log;
@@ -86,8 +86,8 @@ public class OlxSearch {
         BlockingQueue<AnAdwert> outputAnAdwertQueue = 
                                     new ArrayBlockingQueue<>(QUEUE_SIZE);
         
-        OlxParsersPool parserPool = 
-                    new OlxParsersPool(inputLinkQueue, outputAnAdwertQueue);
+        OlxAnAdwertParserPool parserPool = 
+                    new OlxAnAdwertParserPool(inputLinkQueue, outputAnAdwertQueue);
         parserPool.init();
         
         log.error(classname, "Start");
