@@ -14,15 +14,15 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  *
  * @author apu
  */
-public class OlxSearchLListToAdAdwertLThread implements Runnable {
+public class OlxSearchLListToAdAdvertLThread implements Runnable {
     
     private static final Log log = Log.getInstance();
-    private final Class classname = OlxSearchLListToAdAdwertLThread.class;
+    private final Class classname = OlxSearchLListToAdAdvertLThread.class;
 
     private final BlockingQueue<SearchPageQuery> inputSearchPageQueue;
     private final BlockingQueue<String> outputLinkQueue;
 
-    public OlxSearchLListToAdAdwertLThread(
+    public OlxSearchLListToAdAdvertLThread(
                             BlockingQueue<SearchPageQuery> inputSearchPageQueue, 
                             BlockingQueue<String> outputLinkQueue) {
         this.inputSearchPageQueue = inputSearchPageQueue;

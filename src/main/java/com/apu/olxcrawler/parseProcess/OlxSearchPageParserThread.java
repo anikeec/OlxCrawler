@@ -5,8 +5,6 @@
  */
 package com.apu.olxcrawler.parseProcess;
 
-import com.apu.olxcrawler.parser.OlxAnAdwertParser;
-import com.apu.olxcrawler.entity.AnAdwert;
 import com.apu.olxcrawler.parser.OlxSearchParser;
 import com.apu.olxcrawler.query.OlxRequest;
 import com.apu.olxcrawler.utils.Log;

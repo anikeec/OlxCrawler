@@ -9,7 +9,7 @@ package com.apu.olxcrawler.entity;
  *
  * @author apu
  */
-public class AnAdwert {
+public class AnAdvert {
     
     private String author;
     private String description;

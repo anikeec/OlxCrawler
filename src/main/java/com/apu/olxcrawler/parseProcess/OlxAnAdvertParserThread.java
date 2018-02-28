@@ -5,8 +5,8 @@
  */
 package com.apu.olxcrawler.parseProcess;
 
-import com.apu.olxcrawler.parser.OlxAnAdwertParser;
-import com.apu.olxcrawler.entity.AnAdwert;
+import com.apu.olxcrawler.parser.OlxAnAdvertParser;
+import com.apu.olxcrawler.entity.AnAdvert;
 import com.apu.olxcrawler.utils.Log;
 import java.util.concurrent.BlockingQueue;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -15,30 +15,30 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  *
  * @author apu
  */
-public class OlxAnAdwertParserThread implements Runnable {
+public class OlxAnAdvertParserThread implements Runnable {
     
     private static final Log log = Log.getInstance();
-    private final Class classname = OlxAnAdwertParserThread.class;
+    private final Class classname = OlxAnAdvertParserThread.class;
 
     private final BlockingQueue<String> inputLinkQueue;
-    private final BlockingQueue<AnAdwert> outputAnAdwertQueue;
+    private final BlockingQueue<AnAdvert> outputAnAdvertQueue;
 
-    public OlxAnAdwertParserThread(BlockingQueue<String> inputLinkQueue, BlockingQueue<AnAdwert> outputAnAdwertQueue) {
+    public OlxAnAdvertParserThread(BlockingQueue<String> inputLinkQueue, BlockingQueue<AnAdvert> outputAnAdvertQueue) {
         this.inputLinkQueue = inputLinkQueue;
-        this.outputAnAdwertQueue = outputAnAdwertQueue;
+        this.outputAnAdvertQueue = outputAnAdvertQueue;
     }
     
     @Override
     public void run() {
-        OlxAnAdwertParser parser;
-        parser = new OlxAnAdwertParser();
+        OlxAnAdvertParser parser;
+        parser = new OlxAnAdvertParser();
         while(Thread.currentThread().isInterrupted() == false) {
             try {
                 String link = inputLinkQueue.take();
                 log.error(classname, Thread.currentThread().getName() + " take link.");
-                AnAdwert adwert = parser.getAnAdwertFromLink(link);
-                log.error(classname, Thread.currentThread().getName() + " put adwert.");
-                outputAnAdwertQueue.put(adwert);
+                AnAdvert advert = parser.getAnAdvertFromLink(link);
+                log.error(classname, Thread.currentThread().getName() + " put advert.");
+                outputAnAdvertQueue.put(advert);
             } catch (InterruptedException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));
             }

@@ -6,9 +6,8 @@
 package com.apu.olxcrawler.parser;
 
 import com.apu.olxcrawler.OlxVariables;
-import com.apu.olxcrawler.parser.OlxParserUtils;
 import com.apu.olxcrawler.query.OlxRequest;
-import com.apu.olxcrawler.entity.AnAdwert;
+import com.apu.olxcrawler.entity.AnAdvert;
 import static com.apu.olxcrawler.parser.OlxParserUtils.getPatternCutOut;
 import com.apu.olxcrawler.query.OlxResult;
 import com.apu.olxcrawler.utils.Log;
@@ -19,34 +18,34 @@ import java.util.regex.Pattern;
  *
  * @author apu
  */
-public class OlxAnAdwertParser {
+public class OlxAnAdvertParser {
     
     private static final Log log = Log.getInstance();
-    private final Class classname = OlxAnAdwertParser.class;    
+    private final Class classname = OlxAnAdvertParser.class;    
         
     private final String OLX_PHONE_URL = "ajax/misc/contact/phone/";
     
-    public AnAdwert getAnAdwertFromLink(String link) {
-        AnAdwert adwert = new AnAdwert();
+    public AnAdvert getAnAdvertFromLink(String link) {
+        AnAdvert advert = new AnAdvert();
         String content;
         
         OlxRequest request = new OlxRequest();
         OlxResult result = request.makeRequest(link);
         content = result.getContent();
         
-        adwert.setAuthor(getAuthorFromContent(content));
-        adwert.setDescription(getDescriptionFromContent(content));
-        adwert.setHeader(getHeaderFromContent(content));
-        adwert.setId(getIdFromContent(content));
-        adwert.setLink(link);        
-        adwert.setPrice(getPriceFromContent(content));
-        adwert.setPublicationDate(getPublicationDateFromContent(content));
-        adwert.setRegion(getRegionFromContent(content));
-        adwert.setPhone(getPhoneFromUrlAndResult(link, result));
-        adwert.setUserOffers(getUserOffersFromContent(content));
-        adwert.setUserSince(getUserSinceFromContent(content));
+        advert.setAuthor(getAuthorFromContent(content));
+        advert.setDescription(getDescriptionFromContent(content));
+        advert.setHeader(getHeaderFromContent(content));
+        advert.setId(getIdFromContent(content));
+        advert.setLink(link);        
+        advert.setPrice(getPriceFromContent(content));
+        advert.setPublicationDate(getPublicationDateFromContent(content));
+        advert.setRegion(getRegionFromContent(content));
+        advert.setPhone(getPhoneFromUrlAndResult(link, result));
+        advert.setUserOffers(getUserOffersFromContent(content));
+        advert.setUserSince(getUserSinceFromContent(content));
         
-        return adwert;
+        return advert;
     }
     
     private String getPhoneFromUrlAndResult(String urlStr, OlxResult result) {      
@@ -210,10 +209,10 @@ public class OlxAnAdwertParser {
         String urlStr = "https://www.olx.ua/obyavlenie/learn-version-control-with-"
             + "git-raspredelennaya-sistema-upravleniya-vers-IDya9jS.html#5b61bf5b91";
         
-        OlxAnAdwertParser parser = new OlxAnAdwertParser();
+        OlxAnAdvertParser parser = new OlxAnAdvertParser();
 
-        AnAdwert anAdwert = parser.getAnAdwertFromLink(urlStr);
-        System.out.println(anAdwert.getPhone());
+        AnAdvert anAdvert = parser.getAnAdvertFromLink(urlStr);
+        System.out.println(anAdvert.getPhone());
     }
     
 }

@@ -5,9 +5,9 @@
  */
 package com.apu.olxcrawler;
 
-import com.apu.olxcrawler.entity.AnAdwert;
-import com.apu.olxcrawler.parseProcess.OlxAnAdwertParserPool;
-import com.apu.olxcrawler.parseProcess.OlxSearchLListToAdAdwertLThread;
+import com.apu.olxcrawler.entity.AnAdvert;
+import com.apu.olxcrawler.parseProcess.OlxAnAdvertParserPool;
+import com.apu.olxcrawler.parseProcess.OlxSearchLListToAdAdvertLThread;
 import com.apu.olxcrawler.parseProcess.OlxSearchPageParserPool;
 import com.apu.olxcrawler.parseProcess.SearchPageQuery;
 import com.apu.olxcrawler.utils.Log;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
@@ -26,23 +27,25 @@ public class Crawler {
     private static final Log log = Log.getInstance();
     private final Class classname = Crawler.class;
     
+    int POLL_TIMEOUT = 5;
+    
     int SEARCH_INPUT_LINK_QUEUE_SIZE = 500;
     int SEARCH_OUTPUT_SEARCHPAGE_QUEUE_SIZE = 500;
     
     int PARSER_INPUT_LINK_QUEUE_SIZE = 1000;
-    int PARSER_OUTPUT_ANADWERT_QUEUE_SIZE = 1000; 
+    int PARSER_OUTPUT_ANADVERT_QUEUE_SIZE = 1000; 
     
     BlockingQueue<String> searchInputLinkQueue;
     BlockingQueue<SearchPageQuery> outputSearchPageQueue;
     OlxSearchPageParserPool searchPagePool;
     
     BlockingQueue<String> inputLinkQueue;
-    BlockingQueue<AnAdwert> outputAnAdwertQueue;        
-    OlxAnAdwertParserPool parserPool;
+    BlockingQueue<AnAdvert> outputAnAdvertQueue;        
+    OlxAnAdvertParserPool parserPool;
 
     public Crawler() {
-        this.outputAnAdwertQueue = 
-                new ArrayBlockingQueue<>(PARSER_OUTPUT_ANADWERT_QUEUE_SIZE);
+        this.outputAnAdvertQueue = 
+                new ArrayBlockingQueue<>(PARSER_OUTPUT_ANADVERT_QUEUE_SIZE);
         this.inputLinkQueue = 
                 new ArrayBlockingQueue<>(PARSER_INPUT_LINK_QUEUE_SIZE);
         this.outputSearchPageQueue = 
@@ -50,7 +53,7 @@ public class Crawler {
         this.searchInputLinkQueue = 
                 new ArrayBlockingQueue<>(SEARCH_INPUT_LINK_QUEUE_SIZE);
         this.parserPool = 
-                new OlxAnAdwertParserPool(inputLinkQueue, outputAnAdwertQueue);        
+                new OlxAnAdvertParserPool(inputLinkQueue, outputAnAdvertQueue);        
         this.searchPagePool = 
                 new OlxSearchPageParserPool(searchInputLinkQueue, outputSearchPageQueue);        
     }    
@@ -61,14 +64,14 @@ public class Crawler {
         parserPool.init();
         
         Thread thread = new Thread(
-                            new OlxSearchLListToAdAdwertLThread(outputSearchPageQueue, 
+                            new OlxSearchLListToAdAdvertLThread(outputSearchPageQueue, 
                                                                 inputLinkQueue));
         thread.setDaemon(true);
         thread.start();
-        thread.setName("OlxSearchToAdAdwertThread ");    
+        thread.setName("OlxSearchToAdAdvertThread ");    
     }
     
-    public List<AnAdwert> getAdwertsByQueryStr(String strToFind) {
+    public List<AnAdvert> getAdvertsByQueryStr(String strToFind) {
 //        String strToFind = "Операционные  системы";
         
         OlxSearch olxSearch = new OlxSearch();
@@ -86,25 +89,29 @@ public class Crawler {
             }
         }
         
-        List<AnAdwert> adwertList = new ArrayList<>();
+        List<AnAdvert> advertList = new ArrayList<>();
         
-        int counter = 0;
+//        int counter = 0;
+        AnAdvert advert;
         while(true) {
             try {
-                adwertList.add(outputAnAdwertQueue.take());
+                advert = outputAnAdvertQueue.poll(POLL_TIMEOUT, TimeUnit.SECONDS);
+                if(advert == null)
+                    break;
+                advertList.add(advert);
             } catch (InterruptedException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));
             }
-            counter++;
-            if(counter >= 20)
-                break;
+//            counter++;
+//            if(counter >= 20)
+//                break;
         }
         
         log.error(classname, "Finish");
         
         System.out.println("Ready");
         
-        return adwertList;
+        return advertList;
     }
     
 }
