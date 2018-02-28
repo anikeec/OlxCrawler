@@ -14,6 +14,7 @@ import com.apu.olxcrawler.query.OlxResult;
 import com.apu.olxcrawler.utils.Log;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jsoup.Jsoup;
 
 /**
  *
@@ -66,7 +67,13 @@ public class OlxAnAdvertParser {
 
         String startPattern = "{\"value\":\"";
         String endPattern = "\"}";
-        return getPatternCutOut(phoneStr, startPattern, endPattern);
+        String ret = getPatternCutOut(phoneStr, startPattern, endPattern);
+        if(ret != null) {
+            ret = ret.trim();
+            if(ret.equals("000 000 000"))
+                ret = null;
+        }
+        return ret;
     }
     
     private String getTokenFromContent(String content) {
@@ -108,7 +115,7 @@ public class OlxAnAdvertParser {
         String startPattern = "<p class=\"pding10 lheight20 large\">";
         String endPattern = "</p>";
         String ret = getPatternCutOut(innerContent, startPattern, endPattern);
-        if(ret != null) return ret.trim();
+        if(ret != null) return removeHtmlTags(ret).trim();
         else            return ret;
     }
     
@@ -207,6 +214,14 @@ public class OlxAnAdvertParser {
         return getPatternCutOut(content, startPattern, endPattern);
     }
     
+    private String removeHtmlTags(String content) {
+        //String ret = Jsoup.parse(content).text();
+        return content.replaceAll("\\<[^>]{1,10}?>","")
+                .replaceAll("class=\"[^\"]{1,20}?\"","")
+                .replaceAll("data-id=\"[^\"]{1,10}?\"","")
+                .replaceAll("data-raw=\"[^\"]{1,20}?\"","");
+    }
+    
     public static void main(String[] args) {
         String urlStr = "https://www.olx.ua/obyavlenie/learn-version-control-with-"
             + "git-raspredelennaya-sistema-upravleniya-vers-IDya9jS.html#5b61bf5b91";
@@ -215,6 +230,7 @@ public class OlxAnAdvertParser {
 
 //        AnAdvert anAdvert = parser.getAnAdvertFromLink(urlStr);
 //        System.out.println(anAdvert.getPhone());
+        
     }
     
 }
