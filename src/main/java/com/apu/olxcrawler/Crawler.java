@@ -92,7 +92,6 @@ public class Crawler {
         
         List<AnAdvert> advertList = new ArrayList<>();
         
-//        int counter = 0;
         AnAdvert advert;
         while(true) {
             try {
@@ -103,9 +102,6 @@ public class Crawler {
             } catch (InterruptedException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));
             }
-//            counter++;
-//            if(counter >= 20)
-//                break;
         }
         
         log.error(classname, "Finish");
