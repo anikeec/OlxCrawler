@@ -14,16 +14,17 @@ public class OlxParserUtils {
     public static String getPatternCutOut(String content, 
                                             String startPattern, 
                                             String endPattern) {
-        
-        int startPosition = content.indexOf(startPattern) + 
-                                        startPattern.length();
+        if(content == null)
+                            return null;
+        int startPosition = content.indexOf(startPattern) ;
         if(startPosition == -1)
                             return null;
         int endPosition = content.indexOf(endPattern, 
-                                        startPosition + 1);
+                                        startPosition + 
+                                        startPattern.length() + 1);
         if(endPosition == -1)
                             return null;
-        return content.substring(startPosition, endPosition);
+        return content.substring(startPosition + startPattern.length(), endPosition);
     }
     
 }
