@@ -5,6 +5,9 @@
  */
 package com.apu.olxcrawler;
 
+import com.apu.olxcrawler.parser.OlxAnAdwertParser;
+import com.apu.olxcrawler.parser.OlxSearchParser;
+import com.apu.olxcrawler.parseProcess.OlxParsersPool;
 import com.apu.olxcrawler.entity.AnAdwert;
 import com.apu.olxcrawler.query.OlxRequest;
 import com.apu.olxcrawler.utils.Log;
@@ -37,16 +40,17 @@ public class OlxSearch {
                     formatSearchStr(searchStrEncoded) +
                     "/";
             
-            OlxParser parser = new OlxParser();
+            OlxAnAdwertParser parser = new OlxAnAdwertParser();
+            OlxSearchParser searchParser = new OlxSearchParser();
             String searchContent = getRequest(searchStrEncoded);
             
-            Integer amountOfPages = parser.getAmountOfPagesFromContent(searchContent);
-            List<String> list = parser.parseSearchResultOnePage(searchContent);
+            Integer amountOfPages = searchParser.getAmountOfPagesFromContent(searchContent);
+            List<String> list = searchParser.parseSearchResultOnePage(searchContent);
             if(amountOfPages != null) {
                 for(int i=2; i<(amountOfPages + 1); i++) {
                     String link = searchStrEncoded + "?page=" + i;
                     searchContent = getRequest(link);
-                    list.addAll(parser.parseSearchResultOnePage(searchContent));
+                    list.addAll(searchParser.parseSearchResultOnePage(searchContent));
                 }
             }            
             return list;

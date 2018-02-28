@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.apu.olxcrawler;
+package com.apu.olxcrawler.parseProcess;
 
+import com.apu.olxcrawler.parser.OlxAnAdwertParser;
 import com.apu.olxcrawler.entity.AnAdwert;
 import com.apu.olxcrawler.utils.Log;
 import java.util.concurrent.BlockingQueue;
@@ -29,8 +30,8 @@ public class OlxParserThread implements Runnable {
     
     @Override
     public void run() {
-        OlxParser parser;
-        parser = new OlxParser();
+        OlxAnAdwertParser parser;
+        parser = new OlxAnAdwertParser();
         while(Thread.currentThread().isInterrupted() == false) {
             try {
                 String link = inputLinkQueue.take();

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.apu.olxcrawler;
+package com.apu.olxcrawler.parseProcess;
 
 import com.apu.olxcrawler.entity.AnAdwert;
 import com.apu.olxcrawler.query.ConnectionManager;
