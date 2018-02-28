@@ -5,7 +5,6 @@
  */
 package com.apu.olxcrawler.parseProcess;
 
-import com.apu.olxcrawler.entity.AnAdwert;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -14,29 +13,30 @@ import java.util.concurrent.BlockingQueue;
  *
  * @author apu
  */
-public class OlxAnAdwertParserPool {    
+public class OlxSearchPageParserPool {    
     
-    private static final int THREAD_POOL_SIZE = 5;
+    private static final int THREAD_POOL_SIZE = 1;
     
     private final List<Thread> threadList;
     private final BlockingQueue<String> inputLinkQueue;
-    private final BlockingQueue<AnAdwert> outputAnAdwertQueue;
+    private final BlockingQueue<SearchPageQuery> outputSearchPageQueue;
 
-    public OlxAnAdwertParserPool(BlockingQueue<String> inputLinkQueue, 
-                            BlockingQueue<AnAdwert> outputAnAdwertQueue) {
+    public OlxSearchPageParserPool(BlockingQueue<String> inputLinkQueue, 
+                            BlockingQueue<SearchPageQuery> outputSearchPageQueue) {
         this.threadList = new ArrayList<>();
         this.inputLinkQueue = inputLinkQueue;
-        this.outputAnAdwertQueue = outputAnAdwertQueue;
+        this.outputSearchPageQueue = outputSearchPageQueue;
     }
     
     public void init() {
-        OlxAnAdwertParserThread olxThread;
+        OlxSearchPageParserThread olxThread;
         Thread thread;
         for(int i=0; i<THREAD_POOL_SIZE; i++) {
-            olxThread = new OlxAnAdwertParserThread(inputLinkQueue, outputAnAdwertQueue);
+            olxThread = 
+                new OlxSearchPageParserThread(inputLinkQueue, outputSearchPageQueue);
             thread = new Thread(olxThread);
             thread.setDaemon(true);
-            thread.setName("OlxAnAdwertParserThread " + i);
+            thread.setName("OlxSearchPageParserThread " + i);
             threadList.add(thread);
             thread.start();
         }
