@@ -27,14 +27,20 @@ public class OlxSearch {
     
     private final String OLX_SEARCH_URL = "list/q-";
     
-    public List<ExpandedLink> getLinkListBySearchQuery(String searchStr) {
+    public List<ExpandedLink> getLinkListBySearchQuery(ExpandedLink searchStr) {
         try {
-            String searchStrEncoded = URLEncoder.encode(searchStr, "utf-8");
+            String searchStrEncoded = URLEncoder.encode(searchStr.getInitQuery(), "utf-8");
+            String category;
+            if(searchStr.getCategory() == null) {
+                category = OLX_SEARCH_URL;
+            } else {
+                category = searchStr.getCategory() + "/q-";
+            }
             searchStrEncoded = OlxVariables.OLX_HOST_URL +
-                    OLX_SEARCH_URL +
+                    category +
                     formatSearchStr(searchStrEncoded) +
                     "/";
-            return getLinkListBySearchPageLink(searchStrEncoded, searchStr);
+            return getLinkListBySearchPageLink(searchStrEncoded, searchStr.getInitQuery());
         } catch (UnsupportedEncodingException ex) {
             log.error(classname, ExceptionUtils.getStackTrace(ex));
         }

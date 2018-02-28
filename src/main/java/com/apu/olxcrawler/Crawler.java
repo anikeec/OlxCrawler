@@ -72,7 +72,7 @@ public class Crawler {
         thread.setName("OlxSearchToAdAdvertThread ");    
     }
     
-    public List<AnAdvert> getAdvertsByQueryStr(String strToFind) {
+    public List<AnAdvert> getAdvertsByQueryStr(ExpandedLink strToFind) {
 //        String strToFind = "Операционные  системы";
         
         OlxSearch olxSearch = new OlxSearch();

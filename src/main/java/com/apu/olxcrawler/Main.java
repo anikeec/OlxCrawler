@@ -6,6 +6,7 @@
 package com.apu.olxcrawler;
 
 import com.apu.olxcrawler.entity.AnAdvert;
+import com.apu.olxcrawler.entity.ExpandedLink;
 import java.util.List;
 
 /**
@@ -17,7 +18,10 @@ public class Main {
     public static void main(String[] args) {
         Crawler crawler = new Crawler();
         crawler.init();
-        List<AnAdvert> list = crawler.getAdvertsByQueryStr("Операционные  системы");
+        ExpandedLink link = new ExpandedLink();
+        link.setInitQuery("Операционные  системы");
+        link.setCategory(OlxCategory.hobbi_otdyh_i_sport);
+        List<AnAdvert> list = crawler.getAdvertsByQueryStr(link);
         System.out.println("Ready");
     }   
     

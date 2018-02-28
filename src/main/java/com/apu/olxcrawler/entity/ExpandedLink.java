@@ -12,20 +12,48 @@ package com.apu.olxcrawler.entity;
 public class ExpandedLink {
     private String link;
     private String initQuery;
+    private String category;
 
+    public ExpandedLink() {
+        this(null);
+    }
+    
+    public ExpandedLink(String link) {
+        this(link, null);
+    }
+    
     public ExpandedLink(String link, String initQuery) {
+        this(link, initQuery, null);
+    }
+
+    public ExpandedLink(String link, String initQuery, String category) {
         this.link = link;
         this.initQuery = initQuery;
+        this.category = category;
     }
 
     public String getLink() {
         return link;
     }
 
+    public void setLink(String link) {
+        this.link = link;
+    }
+
     public String getInitQuery() {
         return initQuery;
     }
-    
-    
+
+    public void setInitQuery(String initQuery) {
+        this.initQuery = initQuery;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
     
 }
