@@ -64,6 +64,9 @@ public class OlxSearchParser {
     public Integer getAmountOfPagesFromContent(String content) {
         String innerContent = getPagesBlockFromContent(content);
         
+        if(innerContent == null)    
+                return null;
+        
         while(true) {
             String tempContent = getNextPageIndex(innerContent);
             if(tempContent == null) {              
