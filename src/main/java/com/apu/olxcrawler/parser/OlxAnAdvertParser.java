@@ -17,7 +17,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jsoup.Jsoup;
 
 /**
  *
@@ -35,8 +34,7 @@ public class OlxAnAdvertParser {
         String content;
         
         OlxRequest request = new OlxRequest();
-//        OlxResult result = request.makeRequest(link.getLink());
-        OlxResult result = request.makeRequestFull(link.getLink());
+        OlxResult result = request.makeRequest(link.getLink());
         content = result.getContent();
         
         advert.setAuthor(getAuthorFromContent(content));
@@ -47,8 +45,7 @@ public class OlxAnAdvertParser {
         advert.setPrice(getPriceFromContent(content));
         advert.setPublicationDate(getPublicationDateFromContent(content));
         advert.setRegion(getRegionFromContent(content));
-//        advert.setPhone(getPhoneFromUrlAndResult(link.getLink(), result));
-        advert.setPhone(result.getPhone());
+        advert.setPhone(getPhoneFromUrlAndResult(link.getLink(), result));
         advert.setUserOffers(getUserOffersFromContent(content));
         advert.setUserSince(getUserSinceFromContent(content));
         advert.setInitQuery(link.getInitQuery());
@@ -67,7 +64,7 @@ public class OlxAnAdvertParser {
         log.error(classname, Thread.currentThread().getName() + ": " + phoneUrlStr);
         OlxRequest request = new OlxRequest();
         OlxResult phoneRequestResult = 
-                request.makeRequest(phoneUrlStr, urlStr, result.getCookies());
+                request.makeRequest(phoneUrlStr, urlStr, result);//result.getCookies()
         String phoneStr = phoneRequestResult.getContent();
 
         String startPattern = "{\"value\":\"";
@@ -75,9 +72,9 @@ public class OlxAnAdvertParser {
         String ret = getPatternCutOut(phoneStr, startPattern, endPattern);
         if(ret != null) {
             ret = ret.trim();
-            if(ret.equals("000 000 000")) {
-                ret = null;
-            }
+//            if(ret.equals("000 000 000")) {
+//                ret = null;
+//            }
         }
         return ret;
     }
