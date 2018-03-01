@@ -12,6 +12,9 @@ import com.apu.olxcrawler.entity.ExpandedLink;
 import static com.apu.olxcrawler.parser.OlxParserUtils.getPatternCutOut;
 import com.apu.olxcrawler.query.OlxResult;
 import com.apu.olxcrawler.utils.Log;
+import com.apu.olxcrawler.utils.Time;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jsoup.Jsoup;
@@ -59,7 +62,7 @@ public class OlxAnAdvertParser {
         String token = getTokenFromContent(result.getContent());
         String phoneUrlStr = OlxVariables.OLX_HOST_URL + 
                                     OLX_PHONE_URL + idStr + "/?pt=" + token;
-
+        log.error(classname, Thread.currentThread().getName() + ": " + phoneUrlStr);
         OlxRequest request = new OlxRequest();
         OlxResult phoneRequestResult = 
                 request.makeRequest(phoneUrlStr, urlStr, result.getCookies());
@@ -70,8 +73,9 @@ public class OlxAnAdvertParser {
         String ret = getPatternCutOut(phoneStr, startPattern, endPattern);
         if(ret != null) {
             ret = ret.trim();
-            if(ret.equals("000 000 000"))
+            if(ret.equals("000 000 000")) {
                 ret = null;
+            }
         }
         return ret;
     }
@@ -156,9 +160,12 @@ public class OlxAnAdvertParser {
         startPattern = "Добавлено:";
         endPattern = "<small>";
         ret = getPatternCutOut(innerContent, startPattern, endPattern);
-        if(ret != null) return ret.trim();
+        if(ret == null) 
+                return null;
+        String dateContent = ret.trim();
+        Date date = getDateFromPublicationDate(dateContent);
   
-        return null;
+        return Time.timeToDateString(date.getTime());
     }
     
     private String getRegionFromContent(String content) {
@@ -220,6 +227,77 @@ public class OlxAnAdvertParser {
                 .replaceAll("class=\"[^\"]{1,20}?\"","")
                 .replaceAll("data-id=\"[^\"]{1,10}?\"","")
                 .replaceAll("data-raw=\"[^\"]{1,20}?\"","");
+    }
+    
+    private Date getDateFromPublicationDate(String content) {
+        String startPattern = "в ";
+        String endPattern = ",";
+        String timeStr = getPatternCutOut(content, startPattern, endPattern);
+        
+        String[] timeParts = timeStr.trim().split(":");
+        
+        startPattern = ", ";
+        endPattern = ",";
+        String dateStr = getPatternCutOut(content, startPattern, endPattern);
+        
+        String[] dateParts = dateStr.split(" ");
+        Integer hours, minutes;
+        Integer date, year, month;
+        try {
+            hours = Integer.parseInt(timeParts[0]);
+            minutes = Integer.parseInt(timeParts[1]);
+            date = Integer.parseInt(dateParts[0]);
+            year = Integer.parseInt(dateParts[2]);
+        } catch(Exception e) {
+            return null;
+        }        
+        switch(dateParts[1]) {
+            case "января":
+                            month = 1;
+                            break;
+            case "февраля":
+                            month = 2;
+                            break;
+            case "марта":
+                            month = 3;
+                            break;
+            case "апреля":
+                            month = 4;
+                            break;
+            case "мая":
+                            month = 5;
+                            break;
+            case "июня":
+                            month = 6;
+                            break;
+            case "июля":
+                            month = 7;
+                            break;
+            case "августа":
+                            month = 8;
+                            break;
+            case "сентября":
+                            month = 9;
+                            break;
+            case "октября":
+                            month = 10;
+                            break;
+            case "ноября":
+                            month = 11;
+                            break;
+            case "декабря":
+                            month = 12;
+                            break;
+            default:
+                            month = null;
+                            break;
+        }
+        if(month == null)
+                return null;
+        Calendar c = Calendar.getInstance();
+        c.set(year, month - 1, date, hours, minutes);
+        Date retDate = c.getTime();
+        return retDate;
     }
     
     public static void main(String[] args) {
