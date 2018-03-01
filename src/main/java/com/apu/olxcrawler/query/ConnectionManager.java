@@ -23,7 +23,7 @@ public class ConnectionManager {
     private static final Log log = Log.getInstance();
     private final Class classname = ConnectionManager.class;
     
-    private static final int CONN_MANAGERS_AMOUNT_MAX = 10;
+    private static final int CONN_MANAGERS_AMOUNT_MAX = 1;
     private static final int MAX_CONNECTION_PER_HOST = 10;
     
     private final List<MultiThreadedHttpConnectionManager> cmList;

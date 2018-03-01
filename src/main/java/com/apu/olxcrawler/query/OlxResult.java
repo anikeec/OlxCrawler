@@ -5,6 +5,7 @@
  */
 package com.apu.olxcrawler.query;
 
+import com.apu.olxcrawler.entity.CookieItemList;
 import org.apache.commons.httpclient.Cookie;
 
 /**
@@ -13,7 +14,9 @@ import org.apache.commons.httpclient.Cookie;
  */
 public class OlxResult {
     private String content;
-    private Cookie[] cookies;
+    private Cookie[] cookies = null;
+    private CookieItemList cookieList = null;
+    private String phone = null;
 
     public OlxResult(String content, Cookie[] cookies) {
         this.content = content;
@@ -26,6 +29,22 @@ public class OlxResult {
 
     public Cookie[] getCookies() {
         return cookies;
+    }    
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setCookieList(CookieItemList cookieList) {
+        this.cookieList = cookieList;
+    }
+
+    public CookieItemList getCookieList() {
+        return cookieList;
     }    
     
 }

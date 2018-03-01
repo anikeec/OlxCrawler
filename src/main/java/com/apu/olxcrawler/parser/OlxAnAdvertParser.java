@@ -35,7 +35,8 @@ public class OlxAnAdvertParser {
         String content;
         
         OlxRequest request = new OlxRequest();
-        OlxResult result = request.makeRequest(link.getLink());
+//        OlxResult result = request.makeRequest(link.getLink());
+        OlxResult result = request.makeRequestFull(link.getLink());
         content = result.getContent();
         
         advert.setAuthor(getAuthorFromContent(content));
@@ -46,7 +47,8 @@ public class OlxAnAdvertParser {
         advert.setPrice(getPriceFromContent(content));
         advert.setPublicationDate(getPublicationDateFromContent(content));
         advert.setRegion(getRegionFromContent(content));
-        advert.setPhone(getPhoneFromUrlAndResult(link.getLink(), result));
+//        advert.setPhone(getPhoneFromUrlAndResult(link.getLink(), result));
+        advert.setPhone(result.getPhone());
         advert.setUserOffers(getUserOffersFromContent(content));
         advert.setUserSince(getUserSinceFromContent(content));
         advert.setInitQuery(link.getInitQuery());
@@ -80,7 +82,7 @@ public class OlxAnAdvertParser {
         return ret;
     }
     
-    private String getTokenFromContent(String content) {
+    public String getTokenFromContent(String content) {
         String regExpUrl = "(.*)var phoneToken = \\'(.*)\\';(.*)";    
         Pattern pattern = Pattern.compile(regExpUrl, Pattern.DOTALL);  
         
@@ -92,7 +94,7 @@ public class OlxAnAdvertParser {
         return getPatternCutOut(content, startPattern, endPattern);        
     }
     
-    private String getIDfromUrl(String url) {
+    public String getIDfromUrl(String url) {
         String regExpUrl = ".+\\-ID(.*).html(.*)";        
         Pattern pattern = Pattern.compile(regExpUrl, Pattern.DOTALL);        
         Matcher matcher = pattern.matcher(url);        
