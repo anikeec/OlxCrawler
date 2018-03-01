@@ -7,7 +7,9 @@ package com.apu.olxcrawler.entity;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class AnAdvert {
     

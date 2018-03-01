@@ -9,7 +9,9 @@ import com.apu.olxcrawler.entity.CookieItemList;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class OlxResult {
     private String content;

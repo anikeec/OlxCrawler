@@ -13,7 +13,9 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class OlxSearchLListToAdAdvertLThread implements Runnable {
     

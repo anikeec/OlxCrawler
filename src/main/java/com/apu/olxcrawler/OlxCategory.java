@@ -7,8 +7,14 @@ package com.apu.olxcrawler;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class OlxCategory {
     public static final String hobbi_otdyh_i_sport = "hobbi-otdyh-i-sport";
+    
+    
+    public static final String knigi_zhurnaly = "knigi-zhurnaly";
+    
 }

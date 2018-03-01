@@ -9,16 +9,14 @@ import java.util.List;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class SearchPageQuery {
     private String link;
     private List<String> linkList;
     private String initQuery;
-
-//    public SearchPageQuery(String link, List<String> linkList) {
-//        this(link, linkList, null);
-//    }
 
     public SearchPageQuery(String link, List<String> linkList, String initQuery) {
         this.link = link;

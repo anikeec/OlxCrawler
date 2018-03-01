@@ -20,7 +20,9 @@ import java.util.regex.Pattern;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class OlxAnAdvertParser {
     

@@ -9,7 +9,9 @@ import org.apache.commons.httpclient.HttpClient;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class HttpClientItem {
     private int id;

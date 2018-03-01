@@ -21,7 +21,9 @@ import org.apache.http.HttpHeaders;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class OlxRequest {
     

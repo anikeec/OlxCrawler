@@ -5,14 +5,13 @@
  */
 package com.apu.olxcrawler.entity;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import org.apache.commons.httpclient.Cookie;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class CookieItem {
     /**

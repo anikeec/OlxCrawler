@@ -10,7 +10,9 @@ import java.util.List;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class CookieItemList {
     private List<CookieItem> cookieList = new ArrayList<>();

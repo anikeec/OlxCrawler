@@ -12,7 +12,9 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class OlxSearchPageParserPool {    
     

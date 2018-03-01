@@ -9,7 +9,9 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class Log {    
     static Logger logger = Logger.getLogger(Logger.class);

@@ -7,7 +7,9 @@ package com.apu.olxcrawler;
 
 /**
  *
- * @author apu
+ * @author Anikeichyk Pavel
+ * @email  pasha_anik@ukr.net
+ * 
  */
 public class OlxVariables {
     public static final String OLX_HOST_URL = "https://www.olx.ua/";
