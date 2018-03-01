@@ -12,9 +12,19 @@ package com.apu.olxcrawler;
  * 
  */
 public class OlxCategory {
-    public static final String hobbi_otdyh_i_sport = "hobbi-otdyh-i-sport";
+    public static final String OLX_HOST_URL = "https://www.olx.ua/";
     
+    public static final String olx_root_dir = "https://www.olx.ua";
     
+    public static final String detskiy_mir = "detskiy-mir";
+    public static final String elektronika = "elektronika";
+    public static final String hobbi_otdyh_i_sport = "hobbi-otdyh-i-sport";    
+    
+    //hobbi_otdyh_i_sport
+    public static final String antikvariat_kollektsii = "antikvariat-kollektsii";
+    public static final String muzykalnye_instrumenty = "muzykalnye-instrumenty";
+    public static final String cd_dvd_plastinki = "cd-dvd-plastinki";
+    public static final String sport_otdyh = "sport-otdyh"; 
     public static final String knigi_zhurnaly = "knigi-zhurnaly";
     
 }

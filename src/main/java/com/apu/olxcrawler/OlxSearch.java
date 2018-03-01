@@ -38,7 +38,7 @@ public class OlxSearch {
             } else {
                 category = searchStr.getCategory() + "/q-";
             }
-            searchStrEncoded = OlxVariables.OLX_HOST_URL +
+            searchStrEncoded = OlxCategory.OLX_HOST_URL +
                     category +
                     formatSearchStr(searchStrEncoded) +
                     "/";

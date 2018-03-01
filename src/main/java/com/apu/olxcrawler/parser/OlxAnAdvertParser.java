@@ -5,7 +5,7 @@
  */
 package com.apu.olxcrawler.parser;
 
-import com.apu.olxcrawler.OlxVariables;
+import com.apu.olxcrawler.OlxCategory;
 import com.apu.olxcrawler.query.OlxRequest;
 import com.apu.olxcrawler.entity.AnAdvert;
 import com.apu.olxcrawler.entity.ExpandedLink;
@@ -61,7 +61,7 @@ public class OlxAnAdvertParser {
                 return null;
         
         String token = getTokenFromContent(result.getContent());
-        String phoneUrlStr = OlxVariables.OLX_HOST_URL + 
+        String phoneUrlStr = OlxCategory.OLX_HOST_URL + 
                                     OLX_PHONE_URL + idStr + "/?pt=" + token;
         log.error(classname, Thread.currentThread().getName() + ": " + phoneUrlStr);
         OlxRequest request = new OlxRequest();
