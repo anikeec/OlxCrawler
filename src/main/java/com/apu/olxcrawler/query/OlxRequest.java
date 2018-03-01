@@ -5,8 +5,8 @@
  */
 package com.apu.olxcrawler.query;
 
-import com.apu.olxcrawler.entity.CookieItem;
-import com.apu.olxcrawler.entity.CookieItemList;
+import com.apu.olxcrawler.query.cookie.CookieItem;
+import com.apu.olxcrawler.query.cookie.CookieItemList;
 import com.apu.olxcrawler.utils.Log;
 import java.io.IOException;
 import java.util.Date;
