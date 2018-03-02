@@ -7,26 +7,43 @@ package com.apu.olxcrawler.repository.RAM;
 
 import com.apu.olxcrawler.repository.NameRepository;
 import com.apu.olxcrawler.repository.entity.NameEntity;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author apu
  */
 public class NameRepositoryRAM implements NameRepository {
+    
+    private List<String> list = new ArrayList<>();
 
     @Override
     public NameEntity getNameById(Integer id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(id >= list.size()) 
+                return null;
+        return new NameEntity(id, list.get(id));
     }
 
     @Override
     public Integer getIdByNameValue(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(name == null) 
+                return null;
+        Integer id = list.indexOf(name);
+        if(id == -1)
+                return null;
+        else 
+                return id;
     }
 
     @Override
     public Integer add(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Integer index = null;
+        if(getIdByNameValue(name) == null) {
+            index = list.size();
+            list.add(index, name);
+        }
+        return index;
     }
     
 }

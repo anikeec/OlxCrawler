@@ -13,10 +13,10 @@ import com.apu.olxcrawler.repository.entity.PhoneEntity;
  */
 public interface PhoneRepository {
     
-    PhoneEntity getPhoneById(Long id);
+    PhoneEntity getPhoneById(Integer id);
     
     Integer getIdByPhoneNumber(String phoneNumber);
     
-    Long add(String phoneNumber);
+    Integer add(String phoneNumber);
     
 }

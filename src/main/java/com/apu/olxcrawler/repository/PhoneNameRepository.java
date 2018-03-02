@@ -5,8 +5,7 @@
  */
 package com.apu.olxcrawler.repository;
 
-import com.apu.olxcrawler.repository.entity.NameEntity;
-import com.apu.olxcrawler.repository.entity.PhoneEntity;
+import java.util.Date;
 
 /**
  *
@@ -14,10 +13,10 @@ import com.apu.olxcrawler.repository.entity.PhoneEntity;
  */
 public interface PhoneNameRepository {
     
-    PhoneEntity getPhoneByName(NameEntity name);
+    Integer getPhoneIdByNameId(Integer id);
     
-    NameEntity getNameByPhone(PhoneEntity phone);
+    Integer getNameIdByPhoneId(Integer id);
     
-    Integer add(PhoneEntity phone, NameEntity name);
+    Integer add(Integer phoneId, Integer nameId, Date date);
     
 }

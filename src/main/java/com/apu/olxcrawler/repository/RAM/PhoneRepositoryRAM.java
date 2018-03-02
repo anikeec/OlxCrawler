@@ -7,26 +7,43 @@ package com.apu.olxcrawler.repository.RAM;
 
 import com.apu.olxcrawler.repository.PhoneRepository;
 import com.apu.olxcrawler.repository.entity.PhoneEntity;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author apu
  */
 public class PhoneRepositoryRAM implements PhoneRepository {
+    
+    private List<String> list = new ArrayList<>();
 
     @Override
-    public PhoneEntity getPhoneById(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public PhoneEntity getPhoneById(Integer id) {
+        if(id >= list.size()) 
+                return null;
+        return new PhoneEntity(id, list.get(id));
     }
 
     @Override
     public Integer getIdByPhoneNumber(String phoneNumber) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(phoneNumber == null) 
+                return null;
+        Integer id = list.indexOf(phoneNumber);
+        if(id == -1)
+                return null;
+        else 
+                return id;
     }
 
     @Override
-    public Long add(String phoneNumber) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Integer add(String phoneNumber) {
+        Integer index = null;
+        if(getIdByPhoneNumber(phoneNumber) == null) {
+            index = list.size();
+            list.add(index, phoneNumber);
+        }
+        return index;
     }
     
 }
