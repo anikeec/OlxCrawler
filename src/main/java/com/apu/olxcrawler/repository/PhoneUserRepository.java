@@ -5,8 +5,8 @@
  */
 package com.apu.olxcrawler.repository;
 
-import com.apu.olxcrawler.repository.entity.PhoneEntity;
-import com.apu.olxcrawler.repository.entity.UserEntity;
+import com.apu.olxcrawler.repository.entity.PhoneUser;
+import com.apu.olxcrawler.repository.entity.User;
 
 /**
  *
@@ -14,10 +14,10 @@ import com.apu.olxcrawler.repository.entity.UserEntity;
  */
 public interface PhoneUserRepository {
     
-    PhoneEntity getPhoneByUser(UserEntity user);
+    PhoneUser getPhoneByUser(User user);
     
-    UserEntity getUserByPhone(PhoneEntity phone);
+    User getUserByPhone(PhoneUser phone);
     
-    Integer add(PhoneEntity phone, UserEntity user);
+    Integer add(PhoneUser phone, User user);
     
 }

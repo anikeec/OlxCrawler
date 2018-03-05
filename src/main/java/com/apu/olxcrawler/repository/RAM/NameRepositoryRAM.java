@@ -6,7 +6,7 @@
 package com.apu.olxcrawler.repository.RAM;
 
 import com.apu.olxcrawler.repository.NameRepository;
-import com.apu.olxcrawler.repository.entity.NameEntity;
+import com.apu.olxcrawler.repository.entity.UserName;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +19,12 @@ public class NameRepositoryRAM implements NameRepository {
     private List<String> list = new ArrayList<>();
 
     @Override
-    public NameEntity getNameById(Integer id) {
+    public UserName getNameById(Integer id) {
         if(id >= list.size()) 
                 return null;
-        return new NameEntity(id, list.get(id));
+        UserName item = new UserName();
+        item.setName(list.get(id));
+        return item;
     }
 
     @Override

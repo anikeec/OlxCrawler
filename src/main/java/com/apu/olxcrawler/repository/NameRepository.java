@@ -5,7 +5,7 @@
  */
 package com.apu.olxcrawler.repository;
 
-import com.apu.olxcrawler.repository.entity.NameEntity;
+import com.apu.olxcrawler.repository.entity.UserName;
 
 /**
  *
@@ -13,7 +13,7 @@ import com.apu.olxcrawler.repository.entity.NameEntity;
  */
 public interface NameRepository {
     
-    NameEntity getNameById(Integer id);
+    UserName getNameById(Integer id);
     
     Integer getIdByNameValue(String name);
     

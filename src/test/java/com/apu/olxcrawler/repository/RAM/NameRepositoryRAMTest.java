@@ -5,7 +5,7 @@
  */
 package com.apu.olxcrawler.repository.RAM;
 
-import com.apu.olxcrawler.repository.entity.NameEntity;
+import com.apu.olxcrawler.repository.entity.UserName;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -53,7 +53,7 @@ public class NameRepositoryRAMTest {
         System.out.println("getNameById");        
         Integer id = 0;        
         String expResult = NAME_1;
-        NameEntity result = instance.getNameById(id);
+        UserName result = instance.getNameById(id);
         assertEquals(expResult, result.getName());
         id = 1;        
         expResult = NAME_2;

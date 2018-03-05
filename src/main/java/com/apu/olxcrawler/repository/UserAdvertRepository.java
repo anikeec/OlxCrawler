@@ -5,8 +5,8 @@
  */
 package com.apu.olxcrawler.repository;
 
-import com.apu.olxcrawler.repository.entity.AdvertEntity;
-import com.apu.olxcrawler.repository.entity.UserEntity;
+import com.apu.olxcrawler.repository.entity.Advert;
+import com.apu.olxcrawler.repository.entity.User;
 
 /**
  *
@@ -14,10 +14,10 @@ import com.apu.olxcrawler.repository.entity.UserEntity;
  */
 public interface UserAdvertRepository {
     
-    AdvertEntity getAdvertByUser(UserEntity user);
+    Advert getAdvertByUser(User user);
     
-    UserEntity getUserByAdvert(AdvertEntity advert);
+    User getUserByAdvert(Advert advert);
     
-    Integer add(UserEntity user, AdvertEntity advert);
+    Integer add(User user, Advert advert);
     
 }

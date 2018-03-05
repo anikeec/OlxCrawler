@@ -5,9 +5,9 @@
  */
 package com.apu.olxcrawler.repository.RAM;
 
+import com.apu.olxcrawler.repository.entity.PhoneUser;
+import com.apu.olxcrawler.repository.entity.User;
 import com.apu.olxcrawler.repository.PhoneUserRepository;
-import com.apu.olxcrawler.repository.entity.PhoneEntity;
-import com.apu.olxcrawler.repository.entity.UserEntity;
 
 /**
  *
@@ -16,17 +16,17 @@ import com.apu.olxcrawler.repository.entity.UserEntity;
 public class PhoneUserRepositoryRAM implements PhoneUserRepository {
 
     @Override
-    public PhoneEntity getPhoneByUser(UserEntity user) {
+    public PhoneUser getPhoneByUser(User user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public UserEntity getUserByPhone(PhoneEntity phone) {
+    public User getUserByPhone(PhoneUser phone) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Integer add(PhoneEntity phone, UserEntity user) {
+    public Integer add(PhoneUser phone, User user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

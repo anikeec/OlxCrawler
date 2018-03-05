@@ -5,8 +5,8 @@
  */
 package com.apu.olxcrawler.repository.RAM;
 
+import com.apu.olxcrawler.repository.entity.User;
 import com.apu.olxcrawler.repository.UserRepository;
-import com.apu.olxcrawler.repository.entity.UserEntity;
 
 /**
  *
@@ -19,12 +19,12 @@ import com.apu.olxcrawler.repository.entity.UserEntity;
 public class UserRepositoryRAM implements UserRepository {
 
     @Override
-    public UserEntity getAdvertById(Long id) {
+    public User getAdvertById(Long id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Long add(UserEntity user) {
+    public Long add(User user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

@@ -5,7 +5,7 @@
  */
 package com.apu.olxcrawler.repository;
 
-import com.apu.olxcrawler.repository.entity.AdvertEntity;
+import com.apu.olxcrawler.repository.entity.Advert;
 
 /**
  *
@@ -13,8 +13,8 @@ import com.apu.olxcrawler.repository.entity.AdvertEntity;
  */
 public interface AdvertRepository {
     
-    AdvertEntity getAdvertById(Long id);
+    Advert getAdvertById(Long id);
     
-    Long add(AdvertEntity advert);
+    Long add(Advert advert);
     
 }

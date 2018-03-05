@@ -5,8 +5,8 @@
  */
 package com.apu.olxcrawler.repository.RAM;
 
+import com.apu.olxcrawler.repository.entity.PhoneNumber;
 import com.apu.olxcrawler.repository.PhoneRepository;
-import com.apu.olxcrawler.repository.entity.PhoneEntity;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +19,12 @@ public class PhoneRepositoryRAM implements PhoneRepository {
     private List<String> list = new ArrayList<>();
 
     @Override
-    public PhoneEntity getPhoneById(Integer id) {
+    public PhoneNumber getPhoneById(Integer id) {
         if(id >= list.size()) 
                 return null;
-        return new PhoneEntity(id, list.get(id));
+        PhoneNumber item = new PhoneNumber();
+        item.setNumber(list.get(id));
+        return item;
     }
 
     @Override

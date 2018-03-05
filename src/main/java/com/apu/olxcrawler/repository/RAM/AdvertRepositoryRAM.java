@@ -6,7 +6,7 @@
 package com.apu.olxcrawler.repository.RAM;
 
 import com.apu.olxcrawler.repository.AdvertRepository;
-import com.apu.olxcrawler.repository.entity.AdvertEntity;
+import com.apu.olxcrawler.repository.entity.Advert;
 
 /**
  *
@@ -15,12 +15,12 @@ import com.apu.olxcrawler.repository.entity.AdvertEntity;
 public class AdvertRepositoryRAM implements AdvertRepository {
 
     @Override
-    public AdvertEntity getAdvertById(Long id) {
+    public Advert getAdvertById(Long id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Long add(AdvertEntity advert) {
+    public Long add(Advert advert) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

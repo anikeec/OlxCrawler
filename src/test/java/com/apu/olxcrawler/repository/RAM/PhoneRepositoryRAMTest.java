@@ -5,7 +5,7 @@
  */
 package com.apu.olxcrawler.repository.RAM;
 
-import com.apu.olxcrawler.repository.entity.PhoneEntity;
+import com.apu.olxcrawler.repository.entity.PhoneNumber;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -53,12 +53,12 @@ public class PhoneRepositoryRAMTest {
         System.out.println("getPhoneById");
         Integer id = 0;        
         String expResult = PHONE_1;
-        PhoneEntity result = instance.getPhoneById(id);
-        assertEquals(expResult, result.getPhone());
+        PhoneNumber result = instance.getPhoneById(id);
+        assertEquals(expResult, result.getNumber());
         id = 1;        
         expResult = PHONE_2;
         result = instance.getPhoneById(id);
-        assertEquals(expResult, result.getPhone());
+        assertEquals(expResult, result.getNumber());
         id = 100;        
         expResult = null;
         result = instance.getPhoneById(id);

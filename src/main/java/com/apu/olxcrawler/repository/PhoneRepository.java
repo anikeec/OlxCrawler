@@ -5,7 +5,7 @@
  */
 package com.apu.olxcrawler.repository;
 
-import com.apu.olxcrawler.repository.entity.PhoneEntity;
+import com.apu.olxcrawler.repository.entity.PhoneNumber;
 
 /**
  *
@@ -13,7 +13,7 @@ import com.apu.olxcrawler.repository.entity.PhoneEntity;
  */
 public interface PhoneRepository {
     
-    PhoneEntity getPhoneById(Integer id);
+    PhoneNumber getPhoneById(Integer id);
     
     Integer getIdByPhoneNumber(String phoneNumber);
     
