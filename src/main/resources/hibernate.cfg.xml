@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="connection.url">jdbc:mariadb://localhost:3306/olxdb</property>
+        <property name="connection.driver_class">org.mariadb.jdbc.Driver</property>
+        <!-- Enable Hibernate's automatic session context management -->
+        <property name="current_session_context_class">thread</property>
+        <property name="show_sql">true</property>   
+        <property name="connection.pool_size">2</property>
+        <!-- NOTE that after automapping with IDEA property username and password will delete -->
+        <!--and will be:  Initial SessionFactory failedorg.hibernate.service.spi.ServiceException: Unable to create requested service-->
+        <property name="connection.username">app</property>
+        <property name="connection.password">qwerty</property>
+         <!-- NOTE that after automapping with IDEA property username and password will delete -->
+        <mapping class="com.apu.olxcrawler.repository.entity.PhoneUser"/>
+        <mapping class="com.apu.olxcrawler.repository.entity.User"/>
+        <mapping class="com.apu.olxcrawler.repository.entity.PhoneName"/>
+        <mapping class="com.apu.olxcrawler.repository.entity.Advert"/>
+        <mapping class="com.apu.olxcrawler.repository.entity.UserName"/>
+        <mapping class="com.apu.olxcrawler.repository.entity.PhoneNumber"/>
+        <mapping class="com.apu.olxcrawler.repository.entity.UserAdvert"/>
+        <!-- DB schema will be updated if needed -->
+        <!-- <property name="hbm2ddl.auto">update</property> -->
+    </session-factory>
+</hibernate-configuration>
