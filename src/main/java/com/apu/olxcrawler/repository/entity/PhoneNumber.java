@@ -42,10 +42,9 @@ public class PhoneNumber implements Serializable {
     @Column(name = "phonenumber_id")
     private Integer phonenumberId;
     @Column(name = "number")
-    private String number;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "phonenumberId", fetch = FetchType.LAZY)
-    private Collection<PhoneUser> phoneUserCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "phonenumberId", fetch = FetchType.LAZY)
+    private String number; 
+    
+    @OneToMany(mappedBy = "phoneNumber", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Collection<PhoneName> phoneNameCollection;
 
     public PhoneNumber() {
@@ -69,15 +68,6 @@ public class PhoneNumber implements Serializable {
 
     public void setNumber(String number) {
         this.number = number;
-    }
-
-    @XmlTransient
-    public Collection<PhoneUser> getPhoneUserCollection() {
-        return phoneUserCollection;
-    }
-
-    public void setPhoneUserCollection(Collection<PhoneUser> phoneUserCollection) {
-        this.phoneUserCollection = phoneUserCollection;
     }
 
     @XmlTransient
@@ -111,7 +101,7 @@ public class PhoneNumber implements Serializable {
 
     @Override
     public String toString() {
-        return "com.apu.olxcrawler.repository.ORM.Entity.PhoneNumber[ phonenumberId=" + phonenumberId + " ]";
+        return "com.apu.olxcrawler.repository.entity.PhoneNumber[ phonenumberId=" + phonenumberId + " ]";
     }
     
 }

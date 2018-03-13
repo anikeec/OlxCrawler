@@ -6,8 +6,10 @@
 package com.apu.olxcrawler.repository.entity;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,13 +17,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -32,69 +36,72 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "PhoneName.findAll", query = "SELECT p FROM PhoneName p")
-    , @NamedQuery(name = "PhoneName.findById", query = "SELECT p FROM PhoneName p WHERE p.id = :id")
-    , @NamedQuery(name = "PhoneName.findByDate", query = "SELECT p FROM PhoneName p WHERE p.date = :date")})
+    , @NamedQuery(name = "PhoneName.findByPhonenumberId", query = "SELECT p FROM PhoneName p WHERE p.phonenameId = :phonenameId")})
 public class PhoneName implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "id")
-    private Integer id;
-    @Column(name = "date")
-    @Temporal(TemporalType.DATE)
-    private Date date;
-    @JoinColumn(name = "phonenumber_id", referencedColumnName = "phonenumber_id")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private PhoneNumber phonenumberId;
-    @JoinColumn(name = "username_id", referencedColumnName = "username_id")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private UserName usernameId;
+    @Column(name = "phonename_id")
+    private Integer phonenameId; 
+    
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "phoneNameCollection", fetch = FetchType.LAZY)
+    private Collection<Advert> advertCollection = new ArrayList<>();
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "phonenumber_id")
+    private PhoneNumber phoneNumber;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "username_id")
+    private UserName userName;
+    
 
     public PhoneName() {
     }
 
-    public PhoneName(Integer id) {
-        this.id = id;
+    public PhoneName(Integer phonenameId) {
+        this.phonenameId = phonenameId;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getPhonenameId() {
+        return phonenameId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setPhonenameId(Integer phonenameId) {
+        this.phonenameId = phonenameId;
     }
 
-    public Date getDate() {
-        return date;
+    public PhoneNumber getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setPhoneNumber(PhoneNumber phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
-    public PhoneNumber getPhonenumberId() {
-        return phonenumberId;
+    public UserName getUserName() {
+        return userName;
     }
 
-    public void setPhonenumberId(PhoneNumber phonenumberId) {
-        this.phonenumberId = phonenumberId;
+    public void setUserName(UserName userName) {
+        this.userName = userName;
     }
 
-    public UserName getUsernameId() {
-        return usernameId;
+    @XmlTransient
+    public Collection<Advert> getAdvertCollection() {
+        return advertCollection;
     }
 
-    public void setUsernameId(UserName usernameId) {
-        this.usernameId = usernameId;
+    public void setAdvertCollection(Collection<Advert> advertCollection) {
+        this.advertCollection = advertCollection;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (phonenameId != null ? phonenameId.hashCode() : 0);
         return hash;
     }
 
@@ -105,7 +112,7 @@ public class PhoneName implements Serializable {
             return false;
         }
         PhoneName other = (PhoneName) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.phonenameId == null && other.phonenameId != null) || (this.phonenameId != null && !this.phonenameId.equals(other.phonenameId))) {
             return false;
         }
         return true;
@@ -113,7 +120,7 @@ public class PhoneName implements Serializable {
 
     @Override
     public String toString() {
-        return "com.apu.olxcrawler.repository.ORM.Entity.PhoneName[ id=" + id + " ]";
+        return "com.apu.olxcrawler.repository.entity.PhoneName[ phonenameId=" + phonenameId + " ]";
     }
     
 }

@@ -6,7 +6,13 @@
 package com.apu.olxcrawler.repository.ORM;
 
 import com.apu.olxcrawler.repository.NameRepository;
+import com.apu.olxcrawler.repository.entity.Advert;
+import com.apu.olxcrawler.repository.entity.PhoneName;
+import com.apu.olxcrawler.repository.entity.PhoneNumber;
+import com.apu.olxcrawler.repository.entity.User;
 import com.apu.olxcrawler.repository.entity.UserName;
+import java.util.ArrayList;
+import java.util.List;
 import org.hibernate.Session;
 
 /**
@@ -29,9 +35,33 @@ public class NameRepositoryHB implements NameRepository {
     public Integer add(String name) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
+        
         UserName un = new UserName();
         un.setName(name);
+        
         session.persist(un);
+        
+        PhoneNumber pn = new PhoneNumber();        
+        pn.setNumber("Phone " + name);
+        
+        session.persist(pn);
+        
+        PhoneName phoneName = new PhoneName();
+        phoneName.setUserName(un);
+        phoneName.setPhoneNumber(pn);
+        
+        session.persist(phoneName); 
+        
+        User user = new User();
+        
+        session.persist(user);
+        
+        Advert advert = new Advert();
+        advert.getPhoneNameCollection().add(phoneName);
+        advert.setUser(user);
+        
+        session.persist(advert);  
+
         session.flush();
         session.getTransaction().commit();
         return un.getUsernameId();

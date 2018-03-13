@@ -7,20 +7,23 @@ package com.apu.olxcrawler.repository.entity;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -71,8 +74,18 @@ public class Advert implements Serializable {
     @Column(name = "user_since")
     @Temporal(TemporalType.DATE)
     private Date userSince;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "advertId", fetch = FetchType.LAZY)
-    private Collection<UserAdvert> userAdvertCollection;
+    
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name="PHONENAME_ADVERT",
+            joinColumns = @JoinColumn(name = "advert_id", referencedColumnName = "advert_id"),
+            inverseJoinColumns = @JoinColumn(name = "phonename_id", referencedColumnName = "phonename_id") 
+    )  
+    private Collection<PhoneName> phoneNameCollection = new ArrayList<>();
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Advert() {
     }
@@ -153,13 +166,21 @@ public class Advert implements Serializable {
         this.userSince = userSince;
     }
 
-    @XmlTransient
-    public Collection<UserAdvert> getUserAdvertCollection() {
-        return userAdvertCollection;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserAdvertCollection(Collection<UserAdvert> userAdvertCollection) {
-        this.userAdvertCollection = userAdvertCollection;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @XmlTransient
+    public Collection<PhoneName> getPhoneNameCollection() {
+        return phoneNameCollection;
+    }
+
+    public void setPhoneNameCollection(Collection<PhoneName> phoneNameCollection) {
+        this.phoneNameCollection = phoneNameCollection;
     }
 
     @Override
@@ -184,7 +205,7 @@ public class Advert implements Serializable {
 
     @Override
     public String toString() {
-        return "com.apu.olxcrawler.repository.ORM.Entity.Advert[ advertId=" + advertId + " ]";
+        return "com.apu.olxcrawler.repository.entity.Advert[ advertId=" + advertId + " ]";
     }
     
 }

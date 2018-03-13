@@ -15,6 +15,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -43,7 +47,8 @@ public class UserName implements Serializable {
     private Integer usernameId;
     @Column(name = "name")
     private String name;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "usernameId", fetch = FetchType.LAZY)
+    
+    @OneToMany(mappedBy = "userName", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Collection<PhoneName> phoneNameCollection;
 
     public UserName() {
@@ -100,7 +105,7 @@ public class UserName implements Serializable {
 
     @Override
     public String toString() {
-        return "com.apu.olxcrawler.repository.ORM.Entity.UserName[ usernameId=" + usernameId + " ]";
+        return "com.apu.olxcrawler.repository.entity.UserName[ usernameId=" + usernameId + " ]";
     }
     
 }

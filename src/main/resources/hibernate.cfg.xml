@@ -16,14 +16,12 @@
         <property name="connection.username">app</property>
         <property name="connection.password">qwerty</property>
          <!-- NOTE that after automapping with IDEA property username and password will delete -->
-        <mapping class="com.apu.olxcrawler.repository.entity.PhoneUser"/>
         <mapping class="com.apu.olxcrawler.repository.entity.User"/>
-        <mapping class="com.apu.olxcrawler.repository.entity.PhoneName"/>
         <mapping class="com.apu.olxcrawler.repository.entity.Advert"/>
+        <mapping class="com.apu.olxcrawler.repository.entity.PhoneName"/>
         <mapping class="com.apu.olxcrawler.repository.entity.UserName"/>
         <mapping class="com.apu.olxcrawler.repository.entity.PhoneNumber"/>
-        <mapping class="com.apu.olxcrawler.repository.entity.UserAdvert"/>
         <!-- DB schema will be updated if needed -->
-        <!-- <property name="hbm2ddl.auto">update</property> -->
+        <!--<property name="hibernate.hbm2ddl.auto">update</property>-->
     </session-factory>
 </hibernate-configuration>

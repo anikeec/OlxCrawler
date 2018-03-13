@@ -7,6 +7,7 @@ package com.apu.olxcrawler.repository.entity;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -19,6 +20,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -32,7 +35,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u")
     , @NamedQuery(name = "User.findByUserId", query = "SELECT u FROM User u WHERE u.userId = :userId")
-    , @NamedQuery(name = "User.findByName", query = "SELECT u FROM User u WHERE u.name = :name")})
+    , @NamedQuery(name = "User.findByName", query = "SELECT u FROM User u WHERE u.name = :name")
+    , @NamedQuery(name = "User.findByRegistrationDate", query = "SELECT u FROM User u WHERE u.registrationDate = :registrationDate")})
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,10 +47,12 @@ public class User implements Serializable {
     private Integer userId;
     @Column(name = "name")
     private String name;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId", fetch = FetchType.LAZY)
-    private Collection<PhoneUser> phoneUserCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId", fetch = FetchType.LAZY)
-    private Collection<UserAdvert> userAdvertCollection;
+    @Column(name = "registration_date")
+    @Temporal(TemporalType.DATE)
+    private Date registrationDate;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Collection<Advert> advertCollection;
 
     public User() {
     }
@@ -71,22 +77,21 @@ public class User implements Serializable {
         this.name = name;
     }
 
+    public Date getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public void setRegistrationDate(Date registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
     @XmlTransient
-    public Collection<PhoneUser> getPhoneUserCollection() {
-        return phoneUserCollection;
+    public Collection<Advert> getAdvertCollection() {
+        return advertCollection;
     }
 
-    public void setPhoneUserCollection(Collection<PhoneUser> phoneUserCollection) {
-        this.phoneUserCollection = phoneUserCollection;
-    }
-
-    @XmlTransient
-    public Collection<UserAdvert> getUserAdvertCollection() {
-        return userAdvertCollection;
-    }
-
-    public void setUserAdvertCollection(Collection<UserAdvert> userAdvertCollection) {
-        this.userAdvertCollection = userAdvertCollection;
+    public void setAdvertCollection(Collection<Advert> advertCollection) {
+        this.advertCollection = advertCollection;
     }
 
     @Override
@@ -111,7 +116,7 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "com.apu.olxcrawler.repository.ORM.Entity.User[ userId=" + userId + " ]";
+        return "com.apu.olxcrawler.repository.entity.User[ userId=" + userId + " ]";
     }
     
 }
