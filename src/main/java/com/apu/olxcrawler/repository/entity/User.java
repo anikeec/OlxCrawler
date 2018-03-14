@@ -6,6 +6,7 @@
 package com.apu.olxcrawler.repository.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
@@ -16,6 +17,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -47,12 +51,22 @@ public class User implements Serializable {
     private Integer userId;
     @Column(name = "name")
     private String name;
+    @Column(name = "id")
+    private String id;
     @Column(name = "registration_date")
     @Temporal(TemporalType.DATE)
     private Date registrationDate;
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Collection<Advert> advertCollection;
+    
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name="PHONENAME_USER",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "phonename_id", referencedColumnName = "phonename_id") 
+    )  
+    private Collection<PhoneName> phoneNameCollection = new ArrayList<>();
 
     public User() {
     }
@@ -77,6 +91,14 @@ public class User implements Serializable {
         this.name = name;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public Date getRegistrationDate() {
         return registrationDate;
     }
@@ -92,6 +114,15 @@ public class User implements Serializable {
 
     public void setAdvertCollection(Collection<Advert> advertCollection) {
         this.advertCollection = advertCollection;
+    }
+    
+    @XmlTransient
+    public Collection<PhoneName> getPhoneNameCollection() {
+        return phoneNameCollection;
+    }
+
+    public void setPhoneNameCollection(Collection<PhoneName> phoneNameCollection) {
+        this.phoneNameCollection = phoneNameCollection;
     }
 
     @Override

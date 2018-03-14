@@ -39,6 +39,7 @@ CREATE TABLE ADVERT(
 CREATE TABLE USER(
  user_id  INT NOT NULL AUTO_INCREMENT,
  name VARCHAR(15),
+ id VARCHAR(15),
  registration_date DATE,
  PRIMARY KEY (user_id)
 );
@@ -54,6 +55,16 @@ CREATE TABLE PHONENAME_ADVERT(
  PRIMARY KEY (id),
  FOREIGN KEY (phonename_id) REFERENCES PHONE_NAME (phonename_id),
  FOREIGN KEY (advert_id) REFERENCES ADVERT (advert_id)
+);
+
+CREATE TABLE PHONENAME_USER(
+ id  INT NOT NULL AUTO_INCREMENT,
+ phonename_id  INT NOT NULL,
+ user_id  INT NOT NULL,
+ date DATE,
+ PRIMARY KEY (id),
+ FOREIGN KEY (phonename_id) REFERENCES PHONE_NAME (phonename_id),
+ FOREIGN KEY (user_id) REFERENCES USER (user_id)
 );
 
 

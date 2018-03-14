@@ -17,12 +17,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -48,6 +46,9 @@ public class PhoneName implements Serializable {
     
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "phoneNameCollection", fetch = FetchType.LAZY)
     private Collection<Advert> advertCollection = new ArrayList<>();
+    
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "phoneNameCollection", fetch = FetchType.LAZY)
+    private Collection<User> userCollection = new ArrayList<>();
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "phonenumber_id")
@@ -96,6 +97,15 @@ public class PhoneName implements Serializable {
 
     public void setAdvertCollection(Collection<Advert> advertCollection) {
         this.advertCollection = advertCollection;
+    }
+
+    public Collection<User> getUserCollection() {
+        return userCollection;
+    }
+
+    @XmlTransient
+    public void setUserCollection(Collection<User> userCollection) {
+        this.userCollection = userCollection;
     }
 
     @Override
