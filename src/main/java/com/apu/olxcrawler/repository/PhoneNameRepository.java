@@ -5,18 +5,26 @@
  */
 package com.apu.olxcrawler.repository;
 
+import com.apu.olxcrawler.repository.entity.PhoneName;
 import com.apu.olxcrawler.repository.entity.PhoneNumber;
+import com.apu.olxcrawler.repository.entity.UserName;
 
 /**
  *
  * @author apu
  */
-public interface PhoneRepository {
+public interface PhoneNameRepository {
     
-    PhoneNumber getPhoneById(Integer id);
+    PhoneName get(String nameStr, String phoneStr);
     
-    Integer getIdByPhoneNumber(String phoneNumber);
+    PhoneName getPhoneNameById(Integer id);
     
-    Integer add(String phoneNumber);
+    PhoneName getByPhoneNumber(PhoneNumber phoneNumber);
+    
+    PhoneName getByUserName(UserName userName);
+    
+    Integer add(String phoneStr);
+    
+    Long save(PhoneName phoneName);
     
 }

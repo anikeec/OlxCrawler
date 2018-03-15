@@ -11,12 +11,16 @@ import com.apu.olxcrawler.repository.entity.UserName;
  *
  * @author apu
  */
-public interface NameRepository {
+public interface UserNameRepository {
+    
+    UserName get(String name);
     
     UserName getNameById(Integer id);
     
     Integer getIdByNameValue(String name);
     
     Integer add(String name);
+    
+    Integer save(UserName userName);
     
 }

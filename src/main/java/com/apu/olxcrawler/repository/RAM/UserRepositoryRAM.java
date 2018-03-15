@@ -19,12 +19,17 @@ import com.apu.olxcrawler.repository.UserRepository;
 public class UserRepositoryRAM implements UserRepository {
 
     @Override
+    public User get(String idStr) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
     public User getAdvertById(Long id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Long add(User user) {
+    public Integer save(User user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

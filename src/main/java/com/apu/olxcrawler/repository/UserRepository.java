@@ -13,8 +13,10 @@ import com.apu.olxcrawler.repository.entity.User;
  */
 public interface UserRepository {
     
+    User get(String idStr);
+    
     User getAdvertById(Long id);
     
-    Long add(User user);
+    Integer save(User user);
     
 }

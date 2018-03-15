@@ -8,6 +8,7 @@ package com.apu.olxcrawler.repository.entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -22,6 +23,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -42,7 +45,10 @@ public class PhoneName implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "phonename_id")
-    private Integer phonenameId; 
+    private Integer phonenameId;
+    @Column(name = "date")
+    @Temporal(TemporalType.DATE)
+    private Date date;
     
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "phoneNameCollection", fetch = FetchType.LAZY)
     private Collection<Advert> advertCollection = new ArrayList<>();
@@ -72,6 +78,14 @@ public class PhoneName implements Serializable {
 
     public void setPhonenameId(Integer phonenameId) {
         this.phonenameId = phonenameId;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public PhoneNumber getPhoneNumber() {

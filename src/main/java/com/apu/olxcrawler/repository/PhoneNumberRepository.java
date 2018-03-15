@@ -11,12 +11,16 @@ import com.apu.olxcrawler.repository.entity.PhoneNumber;
  *
  * @author apu
  */
-public interface PhoneRepository {
+public interface PhoneNumberRepository {
+    
+    PhoneNumber get(String phoneNumber);
     
     PhoneNumber getPhoneById(Integer id);
     
     Integer getIdByPhoneNumber(String phoneNumber);
     
     Integer add(String phoneNumber);
+    
+    Integer save(PhoneNumber phoneNumber);
     
 }

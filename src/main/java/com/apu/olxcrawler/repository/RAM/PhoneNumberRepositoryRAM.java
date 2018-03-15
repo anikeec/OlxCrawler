@@ -6,15 +6,15 @@
 package com.apu.olxcrawler.repository.RAM;
 
 import com.apu.olxcrawler.repository.entity.PhoneNumber;
-import com.apu.olxcrawler.repository.PhoneRepository;
 import java.util.ArrayList;
 import java.util.List;
+import com.apu.olxcrawler.repository.PhoneNumberRepository;
 
 /**
  *
  * @author apu
  */
-public class PhoneRepositoryRAM implements PhoneRepository {
+public class PhoneNumberRepositoryRAM implements PhoneNumberRepository {
     
     private List<String> list = new ArrayList<>();
 
@@ -25,6 +25,11 @@ public class PhoneRepositoryRAM implements PhoneRepository {
         PhoneNumber item = new PhoneNumber();
         item.setNumber(list.get(id));
         return item;
+    }
+    
+    @Override
+    public PhoneNumber get(String phoneNumber) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -46,6 +51,11 @@ public class PhoneRepositoryRAM implements PhoneRepository {
             list.add(index, phoneNumber);
         }
         return index;
+    }
+
+    @Override
+    public Integer save(PhoneNumber phoneNumber) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

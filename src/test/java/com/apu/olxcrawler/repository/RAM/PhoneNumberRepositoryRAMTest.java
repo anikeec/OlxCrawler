@@ -17,14 +17,14 @@ import static org.junit.Assert.*;
  *
  * @author apu
  */
-public class PhoneRepositoryRAMTest {
+public class PhoneNumberRepositoryRAMTest {
     
     private final String PHONE_1 = "0501234567";
     private final String PHONE_2 = "0631234567";
     private final String PHONE_ERROR = "0000000000";
-    private final PhoneRepositoryRAM instance = new PhoneRepositoryRAM();
+    private final PhoneNumberRepositoryRAM instance = new PhoneNumberRepositoryRAM();
     
-    public PhoneRepositoryRAMTest() {
+    public PhoneNumberRepositoryRAMTest() {
     }
     
     @BeforeClass

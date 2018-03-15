@@ -15,12 +15,12 @@ import com.apu.olxcrawler.repository.entity.Advert;
 public class AdvertRepositoryRAM implements AdvertRepository {
 
     @Override
-    public Advert getAdvertById(Long id) {
+    public Advert get(Long id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Long add(Advert advert) {
+    public Long save(Advert advert) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

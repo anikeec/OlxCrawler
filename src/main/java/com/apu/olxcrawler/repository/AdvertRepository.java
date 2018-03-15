@@ -13,8 +13,8 @@ import com.apu.olxcrawler.repository.entity.Advert;
  */
 public interface AdvertRepository {
     
-    Advert getAdvertById(Long id);
+    Advert get(Long id);
     
-    Long add(Advert advert);
+    Long save(Advert advert);
     
 }
