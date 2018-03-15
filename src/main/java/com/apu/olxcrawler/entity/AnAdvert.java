@@ -22,6 +22,7 @@ public class AnAdvert {
     private String price;
     private String publicationDate;    
     private String region;
+    private String userId;
     private String userOffers;
     private String userSince;
     private String initQuery;
@@ -96,6 +97,14 @@ public class AnAdvert {
 
     public void setRegion(String region) {
         this.region = region;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
     
     public String getUserOffers() {
