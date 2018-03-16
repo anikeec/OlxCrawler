@@ -25,6 +25,6 @@ public interface PhoneNameRepository {
     
     Integer add(String phoneStr);
     
-    Long save(PhoneName phoneName);
+    Integer save(PhoneName phoneName);
     
 }

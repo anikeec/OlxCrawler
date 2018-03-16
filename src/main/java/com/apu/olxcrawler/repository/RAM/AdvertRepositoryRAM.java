@@ -7,6 +7,7 @@ package com.apu.olxcrawler.repository.RAM;
 
 import com.apu.olxcrawler.repository.AdvertRepository;
 import com.apu.olxcrawler.repository.entity.Advert;
+import java.math.BigInteger;
 
 /**
  *
@@ -15,7 +16,7 @@ import com.apu.olxcrawler.repository.entity.Advert;
 public class AdvertRepositoryRAM implements AdvertRepository {
 
     @Override
-    public Advert get(Long id) {
+    public Advert get(BigInteger id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

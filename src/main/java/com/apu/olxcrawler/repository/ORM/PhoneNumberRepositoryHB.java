@@ -5,60 +5,56 @@
  */
 package com.apu.olxcrawler.repository.ORM;
 
-import com.apu.olxcrawler.repository.entity.Advert;
-import com.apu.olxcrawler.repository.entity.PhoneName;
+import com.apu.olxcrawler.repository.PhoneNumberRepository;
 import com.apu.olxcrawler.repository.entity.PhoneNumber;
-import com.apu.olxcrawler.repository.entity.User;
-import com.apu.olxcrawler.repository.entity.UserName;
-import org.hibernate.Session;
-import com.apu.olxcrawler.repository.UserNameRepository;
 import java.util.List;
 import org.hibernate.Query;
+import org.hibernate.Session;
 
 /**
  *
  * @author apu
  */
-public class UserNameRepositoryHB implements UserNameRepository {
+public class PhoneNumberRepositoryHB implements PhoneNumberRepository {
     
     private final Session session;
 
-    public UserNameRepositoryHB(Session session) {
+    public PhoneNumberRepositoryHB(Session session) {
         this.session = session;
     }
     
     @Override
-    public UserName get(String name) {
-        Query query = session.getNamedQuery("UserName.findByName")
-                                .setString("name", name);
-        List<UserName> list = query.list();
+    public PhoneNumber get(String phoneNumber) {
+        Query query = session.getNamedQuery("PhoneNumber.findByNumber")
+                                .setString("number", phoneNumber);
+        List<PhoneNumber> list = query.list();
         if(list.isEmpty())    return null;
         return list.get(0);
     }
 
     @Override
-    public UserName getNameById(Integer id) {
+    public PhoneNumber getPhoneById(Integer id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Integer getIdByNameValue(String name) {
+    public Integer getIdByPhoneNumber(String phoneNumber) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Integer add(String name) {
+    public Integer add(String phoneNumber) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    }    
 
     @Override
-    public Integer save(UserName userName) {
-        UserName userNameTmp = this.get(userName.getName());
-        if(userNameTmp == null) {
-            session.persist(userName);
-            return userName.getUsernameId();
+    public Integer save(PhoneNumber phoneNumber) {
+        PhoneNumber phoneNumberTmp = this.get(phoneNumber.getNumber());
+        if(phoneNumberTmp == null) {
+            session.persist(phoneNumber);
+            return phoneNumber.getPhonenumberId();
         } 
-        return userNameTmp.getUsernameId();
+        return phoneNumberTmp.getPhonenumberId();
     }
- 
+    
 }

@@ -6,6 +6,7 @@
 package com.apu.olxcrawler.repository;
 
 import com.apu.olxcrawler.repository.entity.Advert;
+import java.math.BigInteger;
 
 /**
  *
@@ -13,7 +14,7 @@ import com.apu.olxcrawler.repository.entity.Advert;
  */
 public interface AdvertRepository {
     
-    Advert get(Long id);
+    Advert get(BigInteger id);
     
     Long save(Advert advert);
     
