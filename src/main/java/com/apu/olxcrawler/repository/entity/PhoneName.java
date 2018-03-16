@@ -37,7 +37,19 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "PhoneName.findAll", query = "SELECT p FROM PhoneName p")
-    , @NamedQuery(name = "PhoneName.findByPhonenumberId", query = "SELECT p FROM PhoneName p WHERE p.phonenameId = :phonenameId")})
+    , @NamedQuery(name = "PhoneName.findByPhonenumberId", query = "SELECT p FROM PhoneName p WHERE p.phonenameId = :phonenameId")
+//    , @NamedQuery(name = "PhoneName.findByPhoneIdAndNameId", query = "SELECT p FROM PhoneName p "
+//                                                                        + "INNER JOIN FETCH UserName un ON un.name = :name "
+//                                                                        + "INNER JOIN FETCH PhoneNumber phn ON phn.number = :number")
+//    , @NamedQuery(name = "PhoneName.findByPhoneIdAndNameId", query = "SELECT p FROM UserName un, "
+//                                                                        + "IN(un.phoneNameCollection) p "
+//                                                                        + "WHERE un.name = :name ")
+//  select phonename_id FROM phone_name AS phn INNER JOIN user_name AS un ON un.name = 'Test' INNER JOIN phone_number AS pn ON pn.number = 'Phone Test'      
+    , @NamedQuery(name = "PhoneName.findByPhoneAndName", query = "SELECT p FROM PhoneName p WHERE p.userName = "
+                                                                        + "( SELECT un FROM UserName un WHERE un.name = :name ) "
+                                                                        + "AND p.phoneNumber = "
+                                                                        + "( SELECT phn FROM PhoneNumber phn WHERE phn.number = :number)")    
+    })
 public class PhoneName implements Serializable {
 
     private static final long serialVersionUID = 1L;
