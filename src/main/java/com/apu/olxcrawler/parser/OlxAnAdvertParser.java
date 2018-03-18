@@ -78,9 +78,12 @@ public class OlxAnAdvertParser {
             ret = ret.trim();
             ret = ret.replaceAll("\\s+", "");
             ret = ret.replaceAll("[()\\-\\+]", "");
-//            if(ret.equals("000 000 000")) {
-//                ret = null;
-//            }
+            String regExpUrl = "(38)\\d{10}";
+            Pattern pattern = Pattern.compile(regExpUrl, Pattern.DOTALL);
+            Matcher matcher = pattern.matcher(ret);        
+            if(matcher.matches() == true) {
+                ret = ret.replaceFirst("(38)", "");
+            }
         }        
         return ret;
     }
