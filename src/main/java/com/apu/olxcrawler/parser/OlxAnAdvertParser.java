@@ -158,7 +158,11 @@ public class OlxAnAdvertParser {
         String startPattern = "Опубликовано с мобильного</a>";
         String endPattern = "<small>";
         String ret = getPatternCutOut(innerContent, startPattern, endPattern);
-        if(ret != null) return ret.trim();
+        if(ret != null) {
+            String dateContent = ret.trim();
+            Date date = getDateFromPublicationDate(dateContent);  
+            return Time.timeToDateString(date.getTime());
+        }
         
         startPattern = "Добавлено:";
         endPattern = "<small>";
@@ -191,7 +195,15 @@ public class OlxAnAdvertParser {
         String innerContent = getUserDetailsBlockFromContent(content);
         String startPattern = "<span class=\"user-since\">на OLX с";
         String endPattern = "</span>";
-        return getPatternCutOut(innerContent, startPattern, endPattern);
+        String ret = getPatternCutOut(innerContent, startPattern, endPattern);
+        if(ret == null) 
+                return null;
+        String dateContent = ret.trim();
+        Date date = getDateFromSinceDate(dateContent);
+        if(date == null) {
+            return null;
+        }
+        return Time.timeToDateString(date.getTime());
     }
     
     private String getUserDetailsBlockFromContent(String content) {
@@ -251,7 +263,7 @@ public class OlxAnAdvertParser {
             minutes = Integer.parseInt(timeParts[1]);
             date = Integer.parseInt(dateParts[0]);
             year = Integer.parseInt(dateParts[2]);
-        } catch(Exception e) {
+        } catch(NumberFormatException e) {
             return null;
         }        
         switch(dateParts[1]) {
@@ -299,6 +311,63 @@ public class OlxAnAdvertParser {
                 return null;
         Calendar c = Calendar.getInstance();
         c.set(year, month - 1, date, hours, minutes);
+        Date retDate = c.getTime();
+        return retDate;
+    }
+    
+    private Date getDateFromSinceDate(String dateStr) {
+        String[] dateParts = dateStr.split(" ");
+        Integer year, month;
+        try {
+            year = Integer.parseInt(dateParts[1]);
+        } catch(NumberFormatException e) {
+            return null;
+        }        
+        switch(dateParts[0]) {
+            case "янв.":
+                            month = 1;
+                            break;
+            case "февр.":
+                            month = 2;
+                            break;
+            case "марта":
+                            month = 3;
+                            break;
+            case "апр.":
+                            month = 4;
+                            break;
+            case "мая":
+                            month = 5;
+                            break;
+            case "июня":
+                            month = 6;
+                            break;
+            case "июля":
+                            month = 7;
+                            break;
+            case "авг.":
+                            month = 8;
+                            break;
+            case "сент.":
+                            month = 9;
+                            break;
+            case "окт.":
+                            month = 10;
+                            break;
+            case "нояб.":
+                            month = 11;
+                            break;
+            case "дек.":
+                            month = 12;
+                            break;
+            default:
+                            month = null;
+                            break;
+        }
+        if(month == null)
+                return null;
+        Calendar c = Calendar.getInstance();
+        c.set(year, month - 1, 1);
         Date retDate = c.getTime();
         return retDate;
     }
