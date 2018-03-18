@@ -26,10 +26,21 @@ public class PhoneNameRepositoryHB implements PhoneNameRepository {
     }
     
     @Override
-    public PhoneName get(String nameStr, String phoneStr) {        
-        Query query = session.getNamedQuery("PhoneName.findByPhoneAndName")
+    public PhoneName get(String nameStr, String phoneStr) {  
+        Query query;
+        if((nameStr == null)&&(phoneStr == null)) {
+            query = session.getNamedQuery("PhoneName.findByPhoneNullAndNameNull");
+        } else if(nameStr == null) {
+            query = session.getNamedQuery("PhoneName.findByPhoneAndNameNull")
+                                .setString("number", phoneStr);
+        } else if(phoneStr == null) {
+            query = session.getNamedQuery("PhoneName.findByPhoneNullAndName")
+                                .setString("name", nameStr);
+        } else {           
+            query = session.getNamedQuery("PhoneName.findByPhoneAndName")
                                 .setString("name", nameStr)
                                 .setString("number", phoneStr);
+        }
         List<PhoneName> list = query.list();
         if(list.isEmpty())    return null;
         return list.get(0);

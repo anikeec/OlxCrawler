@@ -49,6 +49,18 @@ import javax.xml.bind.annotation.XmlTransient;
                                                                         + "( SELECT un FROM UserName un WHERE un.name = :name ) "
                                                                         + "AND p.phoneNumber = "
                                                                         + "( SELECT phn FROM PhoneNumber phn WHERE phn.number = :number)")    
+    , @NamedQuery(name = "PhoneName.findByPhoneNullAndNameNull", query = "SELECT p FROM PhoneName p WHERE p.userName = "
+                                                                        + "( SELECT un FROM UserName un WHERE un.name IS NULL ) "
+                                                                        + "AND p.phoneNumber = "
+                                                                        + "( SELECT phn FROM PhoneNumber phn WHERE phn.number IS NULL )")    
+    , @NamedQuery(name = "PhoneName.findByPhoneNullAndName", query = "SELECT p FROM PhoneName p WHERE p.userName = "
+                                                                        + "( SELECT un FROM UserName un WHERE un.name = :name ) "
+                                                                        + "AND p.phoneNumber = "
+                                                                        + "( SELECT phn FROM PhoneNumber phn WHERE phn.number IS NULL )")
+    , @NamedQuery(name = "PhoneName.findByPhoneAndNameNull", query = "SELECT p FROM PhoneName p WHERE p.userName = "
+                                                                        + "( SELECT un FROM UserName un WHERE un.name IS NULL ) "
+                                                                        + "AND p.phoneNumber = "
+                                                                        + "( SELECT phn FROM PhoneNumber phn WHERE phn.number = :number)")    
     })
 public class PhoneName implements Serializable {
 
