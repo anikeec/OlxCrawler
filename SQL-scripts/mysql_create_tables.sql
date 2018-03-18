@@ -25,12 +25,12 @@ CREATE TABLE PHONE_NAME(
 CREATE TABLE ADVERT(
  advert_id  BIGINT NOT NULL AUTO_INCREMENT,
  description TEXT,
- header varchar(50),
+ header TEXT,
  id BIGINT,
- link varchar(200),
+ link TEXT,
  price varchar(10),
  publication_date DATE,
- region varchar(50), 
+ region TEXT, 
  user_since DATE,
  user_id INT NOT NULL,
  PRIMARY KEY (advert_id)
