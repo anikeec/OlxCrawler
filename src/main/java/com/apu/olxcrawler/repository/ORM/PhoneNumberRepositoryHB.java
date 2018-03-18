@@ -25,8 +25,12 @@ public class PhoneNumberRepositoryHB implements PhoneNumberRepository {
     
     @Override
     public PhoneNumber get(String phoneNumber) {
-        Query query = session.getNamedQuery("PhoneNumber.findByNumber")
-                                .setString("number", phoneNumber);
+        Query query;
+        if(phoneNumber == null) 
+            query = session.getNamedQuery("PhoneNumber.findByNumberNull");
+        else
+            query = session.getNamedQuery("PhoneNumber.findByNumber")
+                                        .setString("number", phoneNumber);
         List<PhoneNumber> list = query.list();
         if(list.isEmpty())    return null;
         return list.get(0);

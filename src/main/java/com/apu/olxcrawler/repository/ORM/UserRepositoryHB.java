@@ -25,8 +25,12 @@ public class UserRepositoryHB implements UserRepository {
     
     @Override
     public User get(String idStr) {
-        Query query = session.getNamedQuery("User.findById")
-                                .setString("id", idStr);
+        Query query;
+        if(idStr == null)
+            query = session.getNamedQuery("User.findByIdNull");
+        else
+            query = session.getNamedQuery("User.findById")
+                                        .setString("id", idStr);
         List<User> list = query.list();
         if(list.isEmpty())    return null;
         return list.get(0);

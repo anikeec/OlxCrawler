@@ -36,7 +36,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "UserName.findAll", query = "SELECT u FROM UserName u")
     , @NamedQuery(name = "UserName.findByUsernameId", query = "SELECT u FROM UserName u WHERE u.usernameId = :usernameId")
-    , @NamedQuery(name = "UserName.findByName", query = "SELECT u FROM UserName u WHERE u.name = :name")})
+    , @NamedQuery(name = "UserName.findByName", query = "SELECT u FROM UserName u WHERE u.name = :name")
+    , @NamedQuery(name = "UserName.findByNameNull", query = "SELECT u FROM UserName u WHERE u.name IS NULL")})
 public class UserName implements Serializable {
 
     private static final long serialVersionUID = 1L;

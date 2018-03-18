@@ -29,8 +29,12 @@ public class UserNameRepositoryHB implements UserNameRepository {
     
     @Override
     public UserName get(String name) {
-        Query query = session.getNamedQuery("UserName.findByName")
-                                .setString("name", name);
+        Query query;
+        if(name == null)
+            query = session.getNamedQuery("UserName.findByNameNull");
+        else
+            query = session.getNamedQuery("UserName.findByName")
+                                        .setString("name", name);
         List<UserName> list = query.list();
         if(list.isEmpty())    return null;
         return list.get(0);

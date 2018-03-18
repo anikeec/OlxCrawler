@@ -32,7 +32,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "PhoneNumber.findAll", query = "SELECT p FROM PhoneNumber p")
     , @NamedQuery(name = "PhoneNumber.findByPhonenumberId", query = "SELECT p FROM PhoneNumber p WHERE p.phonenumberId = :phonenumberId")
-    , @NamedQuery(name = "PhoneNumber.findByNumber", query = "SELECT p FROM PhoneNumber p WHERE p.number = :number")})
+    , @NamedQuery(name = "PhoneNumber.findByNumber", query = "SELECT p FROM PhoneNumber p WHERE p.number = :number")
+    , @NamedQuery(name = "PhoneNumber.findByNumberNull", query = "SELECT p FROM PhoneNumber p WHERE p.number IS NULL")})
 public class PhoneNumber implements Serializable {
 
     private static final long serialVersionUID = 1L;
