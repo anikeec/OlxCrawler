@@ -69,6 +69,9 @@ public class Advert implements Serializable {
     @Column(name = "publication_date")
     @Temporal(TemporalType.DATE)
     private Date publicationDate;
+    @Column(name = "publication_time")
+    @Temporal(TemporalType.TIME)
+    private Date publicationTime;
     @Column(name = "region")
     private String region;
     @Column(name = "user_since")
@@ -148,6 +151,14 @@ public class Advert implements Serializable {
 
     public void setPublicationDate(Date publicationDate) {
         this.publicationDate = publicationDate;
+    }
+
+    public Date getPublicationTime() {
+        return publicationTime;
+    }
+
+    public void setPublicationTime(Date publicationTime) {
+        this.publicationTime = publicationTime;
     }
 
     public String getRegion() {

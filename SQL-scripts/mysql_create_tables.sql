@@ -30,6 +30,7 @@ CREATE TABLE ADVERT(
  link TEXT,
  price varchar(10),
  publication_date DATE,
+ publication_time TIME,
  region TEXT, 
  user_since DATE,
  user_id INT NOT NULL,

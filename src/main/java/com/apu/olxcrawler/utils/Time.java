@@ -39,4 +39,13 @@ public class Time {
         return null;
     }
     
+    public static java.sql.Time timeToTime(String time) {
+        try {
+            return new java.sql.Time(dateFormat.parse(time).getTime());
+        } catch (ParseException ex) {
+            log.debug(classname,ExceptionUtils.getStackTrace(ex));
+        }
+        return null;
+    }
+    
 }
