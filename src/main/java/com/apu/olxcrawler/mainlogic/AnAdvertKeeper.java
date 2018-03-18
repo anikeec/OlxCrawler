@@ -22,6 +22,7 @@ import com.apu.olxcrawler.repository.entity.PhoneName;
 import com.apu.olxcrawler.repository.entity.PhoneNumber;
 import com.apu.olxcrawler.repository.entity.User;
 import com.apu.olxcrawler.repository.entity.UserName;
+import com.apu.olxcrawler.utils.Time;
 import java.math.BigInteger;
 import java.util.Date;
 import org.hibernate.Session;
@@ -159,6 +160,14 @@ public class AnAdvertKeeper {
                 adv.setUser(usr);
                 Long advId = advertRepository.save(adv);
                 adv.getPhoneNameCollection().add(phoneName);
+                adv.setDescription(advert.getDescription());
+                adv.setHeader(advert.getHeader());
+                adv.setLink(advert.getLink());
+                adv.setPrice(advert.getPrice());
+                adv.setPublicationDate(Time.timeStrToDate(advert.getPublicationDate()));
+                adv.setPublicationTime(Time.timeStrToTime(advert.getPublicationDate()));
+                adv.setRegion(advert.getRegion());
+                adv.setUserSince(Time.timeStrToDate(advert.getUserSince()));
             } else {
                 /* f7  - if it exists -> check other info and change it if there is a need,
                 check does phonenameId equal to last phonenameId from advert's phonenameCollection
@@ -166,6 +175,14 @@ public class AnAdvertKeeper {
                 */
                 if(adv.getPhoneNameCollection().contains(phoneName) == false)
                     adv.getPhoneNameCollection().add(phoneName);
+                adv.setDescription(advert.getDescription());
+                adv.setHeader(advert.getHeader());
+                adv.setLink(advert.getLink());
+                adv.setPrice(advert.getPrice());
+                adv.setPublicationDate(Time.timeStrToDate(advert.getPublicationDate()));
+                adv.setPublicationTime(Time.timeStrToTime(advert.getPublicationDate()));
+                adv.setRegion(advert.getRegion());
+                adv.setUserSince(Time.timeStrToDate(advert.getUserSince()));
             }
             
             session.flush();
