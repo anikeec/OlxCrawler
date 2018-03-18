@@ -195,7 +195,7 @@ public class OlxAnAdvertParser {
     }
     
     private String getUserDetailsBlockFromContent(String content) {
-        String startPattern = "<div class=\"offer-user__details\">";
+        String startPattern = "<div class=\"offer-user__details \">";
         String endPattern = "</div>";
         return getPatternCutOut(content, startPattern, endPattern);
     }  
