@@ -76,10 +76,12 @@ public class OlxAnAdvertParser {
         String ret = getPatternCutOut(phoneStr, startPattern, endPattern);
         if(ret != null) {
             ret = ret.trim();
+            ret = ret.replaceAll("\\s+", "");
+            ret = ret.replaceAll("[()\\-\\+]", "");
 //            if(ret.equals("000 000 000")) {
 //                ret = null;
 //            }
-        }
+        }        
         return ret;
     }
     
