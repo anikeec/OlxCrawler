@@ -127,7 +127,11 @@ public class OlxAnAdvertParser {
         String startPattern = "<p class=\"pding10 lheight20 large\">";
         String endPattern = "</p>";
         String ret = getPatternCutOut(innerContent, startPattern, endPattern);
-        if(ret != null) return removeHtmlTags(ret).trim();
+        if(ret != null) {
+            ret = removeHtmlTags(ret).trim();
+            ret = ret.replaceAll("\\s+", " ");//[\\pP\\s]
+            return ret;
+        }
         else            return ret;
     }
     
@@ -136,7 +140,10 @@ public class OlxAnAdvertParser {
         String startPattern = "<h1>";
         String endPattern = "</h1>";
         String ret = getPatternCutOut(innerContent, startPattern, endPattern);
-        if(ret != null) return ret.trim();
+        if(ret != null) {
+            ret = ret.replaceAll("\\s+", " ");
+            return ret.trim();
+        }
         else            return ret;
     }
     
