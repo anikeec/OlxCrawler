@@ -30,7 +30,7 @@ public class Time {
         return dateFormat.format(new Date(time));
     }
     
-    public static Date timeToDate(String time) {
+    public static Date timeStrToDate(String time) {
         try {
             return dateFormat.parse(time);
         } catch (ParseException ex) {
@@ -39,7 +39,7 @@ public class Time {
         return null;
     }
     
-    public static java.sql.Time timeToTime(String time) {
+    public static java.sql.Time timeStrToTime(String time) {
         try {
             return new java.sql.Time(dateFormat.parse(time).getTime());
         } catch (ParseException ex) {
