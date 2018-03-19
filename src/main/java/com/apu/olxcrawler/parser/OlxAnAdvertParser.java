@@ -12,6 +12,7 @@ import com.apu.olxcrawler.entity.ExpandedLink;
 import static com.apu.olxcrawler.parser.OlxParserUtils.getPatternCutOut;
 import com.apu.olxcrawler.query.GetRequestException;
 import com.apu.olxcrawler.query.OlxResult;
+import com.apu.olxcrawler.utils.DataChecker;
 import com.apu.olxcrawler.utils.Log;
 import com.apu.olxcrawler.utils.Time;
 import java.util.Calendar;
@@ -35,6 +36,8 @@ public class OlxAnAdvertParser {
     private final String OLX_ADVERT_URL = "obyavlenie/";
     
     public AnAdvert getAnAdvertFromLink(ExpandedLink link) throws GetRequestException {
+        if(link == null) 
+            throw new IllegalArgumentException("link = NULL");
         AnAdvert advert = new AnAdvert();
         String content;
         
@@ -59,14 +62,18 @@ public class OlxAnAdvertParser {
         return advert;
     }
     
-    private String getPhoneFromUrlAndResult(String urlStr, OlxResult result) {      
+    private String getPhoneFromUrlAndResult(String urlStr, OlxResult result) { 
+        if(urlStr == null)    return null;
+        if(result == null)    return null; 
         String idStr = this.getUserIdFromLink(urlStr);
         if(idStr == null)   
-                return null;
-        if(result == null)
-                return null;        
+                return null;               
         
         String token = getTokenFromContent(result.getContent());
+        if(token == null) {
+            log.debug(classname, Thread.currentThread().getName() + ": token = NULL");
+            return null;
+        }
         String phoneUrlStr = OlxCategory.OLX_HOST_URL + 
                                     OLX_PHONE_URL + idStr + "/?pt=" + token;
         log.debug(classname, Thread.currentThread().getName() + ": " + phoneUrlStr);
@@ -99,6 +106,7 @@ public class OlxAnAdvertParser {
     }
     
     private String getUserIdFromLink(String link) {
+        if(link == null)    return null;
         String regExpUrl = "https://www\\.olx\\.ua/" + 
                             OLX_ADVERT_URL + "(.*)\\-ID(.*)\\.html(.*)";    
         Pattern pattern = Pattern.compile(regExpUrl, Pattern.DOTALL);  
@@ -112,6 +120,7 @@ public class OlxAnAdvertParser {
     }
     
     public String getTokenFromContent(String content) {
+        if(content == null) return null;
         String regExpUrl = "(.*)var phoneToken = \\'(.*)\\';(.*)";    
         Pattern pattern = Pattern.compile(regExpUrl, Pattern.DOTALL);  
         
@@ -124,6 +133,7 @@ public class OlxAnAdvertParser {
     }
     
     private String getAuthorFromContent(String content) {
+        if(content == null) return null;
         String innerContent = getUserDetailsBlockFromContent(content);
         String startPattern = "\">";
         String endPattern = "</a>";
@@ -133,6 +143,7 @@ public class OlxAnAdvertParser {
     }   
     
     private String getDescriptionFromContent(String content) {
+        if(content == null) return null;
         String innerContent = getOfferDescriptionContentBlockFromContent(content);
         String startPattern = "<p class=\"pding10 lheight20 large\">";
         String endPattern = "</p>";
@@ -146,6 +157,7 @@ public class OlxAnAdvertParser {
     }
     
     private String getHeaderFromContent(String content) {
+        if(content == null) return null;
         String innerContent = getOfferTitleboxBlockFromContent(content);
         String startPattern = "<h1>";
         String endPattern = "</h1>";
@@ -158,6 +170,7 @@ public class OlxAnAdvertParser {
     }
     
     private String getIdFromContent(String content) {
+        if(content == null) return null;
         String innerContent = getOfferTitleboxDetailsBlockFromContent(content);
         String startPattern = "<small>Номер объявления:";
         String endPattern = "</small>";
@@ -167,15 +180,23 @@ public class OlxAnAdvertParser {
     }
     
     private String getPriceFromContent(String content) {
+        if(content == null) return null;
         String innerContent = getPriceLabelBlockFromContent(content);
         String startPattern = "<strong class=\"xxxx-large not-arranged\">";
         String endPattern = "</strong>";
         String ret = getPatternCutOut(innerContent, startPattern, endPattern);
         if(ret != null) return ret.trim();
-        else            return ret;
+        
+        startPattern = "<strong class=\"xxxx-large arranged\">";
+        endPattern = "</strong>";
+        ret = getPatternCutOut(innerContent, startPattern, endPattern);
+        if(ret != null) return ret.trim();
+
+        return ret;
     }
     
     private String getPublicationDateFromContent(String content) {
+        if(content == null) return null;
         String innerContent = getOfferTitleboxDetailsBlockFromContent(content);
         String startPattern = "Опубликовано с мобильного</a>";
         String endPattern = "<small>";
@@ -198,6 +219,7 @@ public class OlxAnAdvertParser {
     }
     
     private String getRegionFromContent(String content) {
+        if(content == null) return null;
         String innerContent = getOfferTitleboxDetailsBlockFromContent(content);
         String startPattern = "<strong>";
         String endPattern = "</strong>";
@@ -207,6 +229,7 @@ public class OlxAnAdvertParser {
     }
     
     private String getUserOffersFromContent(String content) {
+        if(content == null) return null;
         String innerContent = getUserDetailsBlockFromContent(content);
         String startPattern = "<a href=\"";
         String endPattern = "\">";
@@ -214,6 +237,7 @@ public class OlxAnAdvertParser {
     }
     
     private String getUserSinceFromContent(String content) {
+        if(content == null) return null;
         String innerContent = getUserDetailsBlockFromContent(content);
         String startPattern = "<span class=\"user-since\">на OLX с";
         String endPattern = "</span>";
@@ -229,36 +253,42 @@ public class OlxAnAdvertParser {
     }
     
     private String getUserDetailsBlockFromContent(String content) {
+        if(content == null) return null;
         String startPattern = "<div class=\"offer-user__details \">";
         String endPattern = "</div>";
         return getPatternCutOut(content, startPattern, endPattern);
     }  
     
     private String getPriceLabelBlockFromContent(String content) {
+        if(content == null) return null;
         String startPattern = "<div class=\"price-label\">";
         String endPattern = "</div>";
         return getPatternCutOut(content, startPattern, endPattern);
     }
     
     private String getOfferDescriptionContentBlockFromContent(String content) {
+        if(content == null) return null;
         String startPattern = "<div class=\"clr descriptioncontent marginbott20\">";
         String endPattern = "<div id=\"offerbottombar\" class=\"pding15\">";
         return getPatternCutOut(content, startPattern, endPattern);
     }
     
     private String getOfferTitleboxBlockFromContent(String content) {
+        if(content == null) return null;
         String startPattern = "<div class=\"offer-titlebox\">";
         String endPattern = "<div class=\"offer-titlebox__details\">";
         return getPatternCutOut(content, startPattern, endPattern);
     }
     
     private String getOfferTitleboxDetailsBlockFromContent(String content) {
+        if(content == null) return null;
         String startPattern = "<div class=\"offer-titlebox__details\">";
         String endPattern = "</div>";
         return getPatternCutOut(content, startPattern, endPattern);
     }
     
     private String removeHtmlTags(String content) {
+        if(content == null) return null;
         //String ret = Jsoup.parse(content).text();
         return content.replaceAll("\\<[^>]{1,10}?>","")
                 .replaceAll("class=\"[^\"]{1,20}?\"","")
@@ -267,6 +297,14 @@ public class OlxAnAdvertParser {
     }
     
     private Date getDateFromPublicationDate(String content) {
+        if(content == null) return null;
+        
+        String regExpUrl = "(.){1,3}\\d{1,2}\\:\\d{2}(,)\\s+\\d{1,2}\\s+(.){8,14}";
+        if(DataChecker.regularCheck(content, regExpUrl) == false) {
+            log.error(classname, "Wrong content :" + content);
+            return null;
+        }
+        
         String startPattern = "в ";
         String endPattern = ",";
         String timeStr = getPatternCutOut(content, startPattern, endPattern);
@@ -338,6 +376,14 @@ public class OlxAnAdvertParser {
     }
     
     private Date getDateFromSinceDate(String dateStr) {
+        if(dateStr == null) return null;
+        
+        String regExpUrl = "(.*)\\s+\\d{4}";
+        if(DataChecker.regularCheck(dateStr, regExpUrl) == false) {
+            log.error(classname, "Wrong dateStr :" + dateStr);
+            return null;
+        }
+        
         String[] dateParts = dateStr.split(" ");
         Integer year, month;
         try {
