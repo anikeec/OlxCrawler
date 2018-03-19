@@ -23,6 +23,12 @@ public class DataChecker {
             throw new IllegalInputValueException(exceptionMsg);
     }
     
+    public static boolean regularCheck(String input, String regExp) {
+        Pattern pattern = Pattern.compile(regExp, Pattern.DOTALL);        
+        Matcher matcher = pattern.matcher(input);        
+        return matcher.matches();
+    }
+    
     public static void nullCheck(String input, String exceptionMsg) 
             throws IllegalInputValueException {
         if(input == null)
