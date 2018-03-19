@@ -69,7 +69,7 @@ public class OlxAnAdvertParser {
         String token = getTokenFromContent(result.getContent());
         String phoneUrlStr = OlxCategory.OLX_HOST_URL + 
                                     OLX_PHONE_URL + idStr + "/?pt=" + token;
-        log.error(classname, Thread.currentThread().getName() + ": " + phoneUrlStr);
+        log.debug(classname, Thread.currentThread().getName() + ": " + phoneUrlStr);
         OlxRequest request = new OlxRequest();
         try {
             OlxResult phoneRequestResult = 

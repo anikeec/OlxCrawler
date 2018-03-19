@@ -33,7 +33,7 @@ public class AnAdvertKeeperThread extends Thread {
             try {
                 advert = inputAnAdvertQueue.take();
                 keeper.keepAnAdvert(advert);
-                log.error(classname, "Save to DB advert: " + advert.getId());
+                log.debug(classname, "Save to DB advert: " + advert.getId());
             } catch (InterruptedException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));
             }

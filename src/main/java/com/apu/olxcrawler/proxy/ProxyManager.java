@@ -112,7 +112,7 @@ public class ProxyManager {
 //        catch (IOException ex) {
 //            log.error(classname, ExceptionUtils.getStackTrace(ex));
 //        }
-        log.error(classname, "Check proxy: " + item.getIp() + ":" + item.getPort());
+        log.debug(classname, "Check proxy: " + item.getIp() + ":" + item.getPort());
         Proxy proxy = new Proxy(Proxy.Type.HTTP, 
                 new InetSocketAddress(item.getIp(), item.getPort()));
         URL url;

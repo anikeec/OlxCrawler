@@ -39,9 +39,9 @@ public class OlxAnAdvertParserThread implements Runnable {
         while(Thread.currentThread().isInterrupted() == false) {
             try {
                 ExpandedLink link = inputLinkQueue.take();
-                log.error(classname, Thread.currentThread().getName() + " take link.");
+                log.debug(classname, Thread.currentThread().getName() + " take link.");
                 AnAdvert advert = parser.getAnAdvertFromLink(link);
-                log.error(classname, Thread.currentThread().getName() + " put advert.");
+                log.debug(classname, Thread.currentThread().getName() + " put advert.");
                 outputAnAdvertQueue.put(advert);
             } catch (InterruptedException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));

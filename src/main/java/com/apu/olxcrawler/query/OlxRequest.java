@@ -60,9 +60,9 @@ public class OlxRequest {
             request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
             request.setRequestHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 6.1; Win64; x64) "
                     + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36");
-            log.error(classname, Thread.currentThread().getName() + " send request");
+            log.debug(classname, Thread.currentThread().getName() + " send request");
             client.executeMethod(request);
-            log.error(classname, Thread.currentThread().getName() + " get responce");
+            log.debug(classname, Thread.currentThread().getName() + " get responce");
             String responseBody = request.getResponseBodyAsString();
             Cookie[] cookies = client.getState().getCookies();
             
@@ -111,9 +111,9 @@ public class OlxRequest {
             request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
             request.setRequestHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 6.1; Win64; x64) "
                     + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36");
-            log.error(classname, Thread.currentThread().getName() + " send request");
+            log.debug(classname, Thread.currentThread().getName() + " send request");
             client.executeMethod(request);
-            log.error(classname, Thread.currentThread().getName() + " get responce");
+            log.debug(classname, Thread.currentThread().getName() + " get responce");
             String responseBody = request.getResponseBodyAsString();
             Cookie[] cookiesRet = client.getState().getCookies();
             CookieItemList cookieList = 

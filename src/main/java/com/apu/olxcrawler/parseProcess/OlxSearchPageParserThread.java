@@ -41,7 +41,7 @@ public class OlxSearchPageParserThread implements Runnable {
         while(Thread.currentThread().isInterrupted() == false) {
             try {
                 ExpandedLink searchPageLink = inputLinkQueue.take();
-                log.error(classname, Thread.currentThread().getName() + " take link.");
+                log.debug(classname, Thread.currentThread().getName() + " take link.");
                 
                 String content = 
                         new OlxRequest().makeRequest(searchPageLink.getLink()).getContent();
@@ -53,7 +53,7 @@ public class OlxSearchPageParserThread implements Runnable {
                                             linkList,
                                             searchPageLink.getInitQuery());
                 
-                log.error(classname, Thread.currentThread().getName() + " put result links.");                
+                log.debug(classname, Thread.currentThread().getName() + " put result links.");                
                 outputSearchPageQueue.put(searchResult);
             } catch (InterruptedException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));
