@@ -5,6 +5,8 @@
  */
 package com.apu.olxcrawler.query;
 
+import com.apu.olxcrawler.proxy.ProxyItem;
+import com.apu.olxcrawler.proxy.ProxyManager;
 import com.apu.olxcrawler.query.cookie.CookieItem;
 import com.apu.olxcrawler.query.cookie.CookieItemList;
 import com.apu.olxcrawler.utils.Log;
@@ -12,11 +14,12 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.httpclient.Cookie;
+import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpHost;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpHeaders;
 
 /**
@@ -38,6 +41,14 @@ public class OlxRequest {
         HttpClient client = httpClientItem.getHttpClient();
 //        client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
         GetMethod request = new GetMethod(urlStr);
+        
+        ProxyManager proxyManager = ProxyManager.getInstance();
+        ProxyItem proxy = proxyManager.take();
+        if(proxy != null) {
+            HttpHost proxyHost = new HttpHost(proxy.getIp());
+            HostConfiguration config = client.getHostConfiguration();
+            config.setProxy(proxyHost.getHostName(), proxy.getPort());
+        }
         
         try {
             request.setRequestHeader(HttpHeaders.HOST, "www.olx.ua");
@@ -62,6 +73,7 @@ public class OlxRequest {
         } catch (IOException ex) {
             throw new GetRequestException("gerRequestError.", ex);
         } finally {
+            proxyManager.put(proxy);
             request.releaseConnection();
             connectionManager.putClient(httpClientItem);
         }
@@ -76,6 +88,14 @@ public class OlxRequest {
         
         Cookie[] cookies = 
                         cookieItemListToCookies(previousResult.getCookieList());
+        
+        ProxyManager proxyManager = ProxyManager.getInstance();
+        ProxyItem proxy = proxyManager.take();
+        if(proxy != null) {
+            HttpHost proxyHost = new HttpHost(proxy.getIp());
+            HostConfiguration config = client.getHostConfiguration();
+            config.setProxy(proxyHost.getHostName(), proxy.getPort());
+        }
         
         try {
             HttpState state = new HttpState();
@@ -102,6 +122,7 @@ public class OlxRequest {
         } catch (IOException ex) {
             throw new GetRequestException("gerRequestError.", ex);
         } finally {
+            proxyManager.put(proxy);
             request.releaseConnection();
             connectionManager.putClient(httpClientItem);
         }
