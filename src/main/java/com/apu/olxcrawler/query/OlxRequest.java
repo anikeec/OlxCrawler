@@ -33,7 +33,7 @@ public class OlxRequest {
     private final ConnectionManager connectionManager = 
                             ConnectionManager.getInstance();
     
-    public OlxResult makeRequest(String urlStr) {
+    public OlxResult makeRequest(String urlStr) throws GetRequestException {
         HttpClientItem httpClientItem = connectionManager.getClient();
         HttpClient client = httpClientItem.getHttpClient();
 //        client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
@@ -60,15 +60,15 @@ public class OlxRequest {
 
             return new OlxResult(responseBody, cookieList);
         } catch (IOException ex) {
-            log.error(classname, ExceptionUtils.getStackTrace(ex));
+            throw new GetRequestException("gerRequestError.", ex);
         } finally {
             request.releaseConnection();
             connectionManager.putClient(httpClientItem);
         }
-        return null;
     }
     
-    public OlxResult makeRequest(String urlStr, String refererUrlStr, OlxResult previousResult) {
+    public OlxResult makeRequest(String urlStr, String refererUrlStr, OlxResult previousResult) 
+                throws GetRequestException {
         HttpClientItem httpClientItem = connectionManager.getClient();
         HttpClient client = httpClientItem.getHttpClient();
         client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
@@ -100,12 +100,11 @@ public class OlxRequest {
                         cookiesToCookieItemList(cookiesRet);
             return new OlxResult(responseBody, cookieList);
         } catch (IOException ex) {
-            log.error(classname, ExceptionUtils.getStackTrace(ex));
+            throw new GetRequestException("gerRequestError.", ex);
         } finally {
             request.releaseConnection();
             connectionManager.putClient(httpClientItem);
         }
-        return null;
     }
     
     private CookieItemList cookiesToCookieItemList(Cookie[] cookiesFirst) {

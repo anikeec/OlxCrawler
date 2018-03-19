@@ -8,6 +8,7 @@ package com.apu.olxcrawler.parseProcess;
 import com.apu.olxcrawler.parser.OlxAnAdvertParser;
 import com.apu.olxcrawler.entity.AnAdvert;
 import com.apu.olxcrawler.entity.ExpandedLink;
+import com.apu.olxcrawler.query.GetRequestException;
 import com.apu.olxcrawler.utils.Log;
 import java.util.concurrent.BlockingQueue;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -43,6 +44,8 @@ public class OlxAnAdvertParserThread implements Runnable {
                 log.error(classname, Thread.currentThread().getName() + " put advert.");
                 outputAnAdvertQueue.put(advert);
             } catch (InterruptedException ex) {
+                log.error(classname, ExceptionUtils.getStackTrace(ex));
+            } catch (GetRequestException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));
             }
         }

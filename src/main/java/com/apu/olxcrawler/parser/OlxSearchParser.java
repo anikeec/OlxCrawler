@@ -24,6 +24,7 @@ public class OlxSearchParser {
     
     public List<String> parseSearchResultOnePage(String content) {
         List<String> list = new ArrayList<>();
+        if(content == null)  return list;
         String regExpUrl = "https://www.olx.ua/obyavlenie/(.+)\" class=\"marginright5 link linkWithHash detailsLink\"";
         Pattern pattern = Pattern.compile(regExpUrl, 
                 Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);        
@@ -64,6 +65,7 @@ public class OlxSearchParser {
     }
     
     public Integer getAmountOfPagesFromContent(String content) {
+        if(content == null) return null;
         String innerContent = getPagesBlockFromContent(content);
         
         if(innerContent == null)    

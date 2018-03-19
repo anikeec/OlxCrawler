@@ -10,6 +10,7 @@ import com.apu.olxcrawler.query.OlxRequest;
 import com.apu.olxcrawler.entity.AnAdvert;
 import com.apu.olxcrawler.entity.ExpandedLink;
 import static com.apu.olxcrawler.parser.OlxParserUtils.getPatternCutOut;
+import com.apu.olxcrawler.query.GetRequestException;
 import com.apu.olxcrawler.query.OlxResult;
 import com.apu.olxcrawler.utils.Log;
 import com.apu.olxcrawler.utils.Time;
@@ -17,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  *
@@ -32,7 +34,7 @@ public class OlxAnAdvertParser {
     private final String OLX_PHONE_URL = "ajax/misc/contact/phone/";
     private final String OLX_ADVERT_URL = "obyavlenie/";
     
-    public AnAdvert getAnAdvertFromLink(ExpandedLink link) {
+    public AnAdvert getAnAdvertFromLink(ExpandedLink link) throws GetRequestException {
         AnAdvert advert = new AnAdvert();
         String content;
         
@@ -61,31 +63,39 @@ public class OlxAnAdvertParser {
         String idStr = this.getUserIdFromLink(urlStr);
         if(idStr == null)   
                 return null;
+        if(result == null)
+                return null;        
         
         String token = getTokenFromContent(result.getContent());
         String phoneUrlStr = OlxCategory.OLX_HOST_URL + 
                                     OLX_PHONE_URL + idStr + "/?pt=" + token;
         log.error(classname, Thread.currentThread().getName() + ": " + phoneUrlStr);
         OlxRequest request = new OlxRequest();
-        OlxResult phoneRequestResult = 
-                request.makeRequest(phoneUrlStr, urlStr, result);//result.getCookies()
-        String phoneStr = phoneRequestResult.getContent();
+        try {
+            OlxResult phoneRequestResult = 
+                    request.makeRequest(phoneUrlStr, urlStr, result); //result.getCookies()
+        
+            String phoneStr = phoneRequestResult.getContent();
 
-        String startPattern = "{\"value\":\"";
-        String endPattern = "\"}";
-        String ret = getPatternCutOut(phoneStr, startPattern, endPattern);
-        if(ret != null) {
-            ret = ret.trim();
-            ret = ret.replaceAll("\\s+", "");
-            ret = ret.replaceAll("[()\\-\\+]", "");
-            String regExpUrl = "(38)\\d{10}";
-            Pattern pattern = Pattern.compile(regExpUrl, Pattern.DOTALL);
-            Matcher matcher = pattern.matcher(ret);        
-            if(matcher.matches() == true) {
-                ret = ret.replaceFirst("(38)", "");
-            }
-        }        
-        return ret;
+            String startPattern = "{\"value\":\"";
+            String endPattern = "\"}";
+            String ret = getPatternCutOut(phoneStr, startPattern, endPattern);
+            if(ret != null) {
+                ret = ret.trim();
+                ret = ret.replaceAll("\\s+", "");
+                ret = ret.replaceAll("[()\\-\\+]", "");
+                String regExpUrl = "(38)\\d{10}";
+                Pattern pattern = Pattern.compile(regExpUrl, Pattern.DOTALL);
+                Matcher matcher = pattern.matcher(ret);        
+                if(matcher.matches() == true) {
+                    ret = ret.replaceFirst("(38)", "");
+                }
+            }        
+            return ret;
+        } catch (GetRequestException ex) {
+            log.error(classname, ExceptionUtils.getStackTrace(ex));
+        }
+        return null;
     }
     
     private String getUserIdFromLink(String link) {
@@ -384,18 +394,18 @@ public class OlxAnAdvertParser {
         return retDate;
     }
     
-    public static void main(String[] args) {
-        String urlStr = "https://www.olx.ua/obyavlenie/learn-version-control-with-"
-            + "git-raspredelennaya-sistema-upravleniya-vers-IDya9jS.html#5b61bf5b91";
-        
-        OlxAnAdvertParser parser = new OlxAnAdvertParser();
-
-        ExpandedLink link = new ExpandedLink();
-        link.setLink(urlStr);
-        
-        AnAdvert anAdvert = parser.getAnAdvertFromLink(link);
-        System.out.println(anAdvert.getUserId());
-        
-    }
+//    public static void main(String[] args) {
+//        String urlStr = "https://www.olx.ua/obyavlenie/learn-version-control-with-"
+//            + "git-raspredelennaya-sistema-upravleniya-vers-IDya9jS.html#5b61bf5b91";
+//        
+//        OlxAnAdvertParser parser = new OlxAnAdvertParser();
+//
+//        ExpandedLink link = new ExpandedLink();
+//        link.setLink(urlStr);
+//        
+//        AnAdvert anAdvert = parser.getAnAdvertFromLink(link);
+//        System.out.println(anAdvert.getUserId());
+//        
+//    }
     
 }

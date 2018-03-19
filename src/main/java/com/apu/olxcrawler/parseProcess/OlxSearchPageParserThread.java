@@ -7,6 +7,7 @@ package com.apu.olxcrawler.parseProcess;
 
 import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.parser.OlxSearchParser;
+import com.apu.olxcrawler.query.GetRequestException;
 import com.apu.olxcrawler.query.OlxRequest;
 import com.apu.olxcrawler.utils.Log;
 import java.util.List;
@@ -55,6 +56,8 @@ public class OlxSearchPageParserThread implements Runnable {
                 log.error(classname, Thread.currentThread().getName() + " put result links.");                
                 outputSearchPageQueue.put(searchResult);
             } catch (InterruptedException ex) {
+                log.error(classname, ExceptionUtils.getStackTrace(ex));
+            } catch (GetRequestException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));
             }
         }
