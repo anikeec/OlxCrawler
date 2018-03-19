@@ -8,11 +8,14 @@ package com.apu.olxcrawler;
 import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.parser.OlxSearchParser;
 import com.apu.olxcrawler.query.OlxRequest;
+import com.apu.olxcrawler.query.OlxResult;
+import com.apu.olxcrawler.utils.DataChecker;
 import com.apu.olxcrawler.utils.Log;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -30,6 +33,7 @@ public class OlxSearch {
     private final String OLX_SEARCH_URL = "list/q-";
     
     public List<ExpandedLink> getLinkListBySearchQuery(ExpandedLink searchStr) {
+        DataChecker.nullCheck(searchStr, "searchStr");
         try {
             String searchStrEncoded = URLEncoder.encode(searchStr.getInitQuery(), "utf-8");
             String category;
@@ -46,10 +50,16 @@ public class OlxSearch {
         } catch (UnsupportedEncodingException ex) {
             log.error(classname, ExceptionUtils.getStackTrace(ex));
         }
-        return null;
+        List<ExpandedLink> emptyList = new ArrayList<>();
+        return emptyList;
     }
     
-    private List<ExpandedLink> getLinkListBySearchPageLink(String link, String searchStr) {
+    private List<ExpandedLink> getLinkListBySearchPageLink(String link, String searchStr) {        
+        DataChecker.nullCheck(searchStr, "searchStr");
+        DataChecker.nullCheck(link, "link");        
+        String regExpUrl = "https://www\\.olx\\.ua/(.*)";
+        DataChecker.regularCheck(link, regExpUrl, "Error input link: " + link);
+        
         OlxSearchParser searchParser = new OlxSearchParser();
         String searchContent = getRequest(link);
         Integer amountOfPages = 
@@ -65,17 +75,16 @@ public class OlxSearch {
         return list;
     }
     
-    public String find(String searchStr, String region) throws Exception {
-        throw new Exception("Not realized yet");
-    }
-    
     private String formatSearchStr(String searchStr) {
         Pattern CLEAR_PATTERN = Pattern.compile("[\\s]+");
         return CLEAR_PATTERN.matcher(searchStr).replaceAll("-").trim();
     }
     
-    private String getRequest(String queryStr) {         
-        return new OlxRequest().makeRequest(queryStr).getContent();
+    private String getRequest(String queryStr) { 
+        OlxResult result = new OlxRequest().makeRequest(queryStr);
+        if(result == null)
+            return "";
+        return result.getContent();
     }
     
 }
