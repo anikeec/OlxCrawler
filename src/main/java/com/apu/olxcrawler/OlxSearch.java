@@ -6,6 +6,7 @@
 package com.apu.olxcrawler;
 
 import com.apu.olxcrawler.entity.ExpandedLink;
+import com.apu.olxcrawler.parser.IllegalInputValueException;
 import com.apu.olxcrawler.parser.OlxSearchParser;
 import com.apu.olxcrawler.query.GetRequestException;
 import com.apu.olxcrawler.query.OlxRequest;
@@ -35,7 +36,8 @@ public class OlxSearch {
     
     private final String OLX_SEARCH_URL = "list/q-";
     
-    public List<ExpandedLink> getLinkListBySearchQuery(ExpandedLink searchStr) {
+    public List<ExpandedLink> getLinkListBySearchQuery(ExpandedLink searchStr) 
+            throws IllegalInputValueException {
         DataChecker.nullCheck(searchStr, "searchStr");
         try {
             String searchStrEncoded = URLEncoder.encode(searchStr.getInitQuery(), "utf-8");
@@ -57,7 +59,8 @@ public class OlxSearch {
         return emptyList;
     }
     
-    private List<ExpandedLink> getLinkListBySearchPageLink(String link, String searchStr) { 
+    private List<ExpandedLink> getLinkListBySearchPageLink(String link, String searchStr) 
+            throws IllegalInputValueException { 
         DataChecker.nullCheck(searchStr, "searchStr");
         DataChecker.nullCheck(link, "link");
         String regExpUrl = "https://www\\.olx\\.ua/(.*)";

@@ -5,6 +5,7 @@
  */
 package com.apu.olxcrawler.utils;
 
+import com.apu.olxcrawler.parser.IllegalInputValueException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,21 +15,24 @@ import java.util.regex.Pattern;
  */
 public class DataChecker {
     
-    public static void regularCheck(String input, String regExp, String exceptionMsg) {
+    public static void regularCheck(String input, String regExp, String exceptionMsg) 
+            throws IllegalInputValueException {
         Pattern pattern = Pattern.compile(regExp, Pattern.DOTALL);        
         Matcher matcher = pattern.matcher(input);        
         if(matcher.matches() == false) 
-            throw new IllegalArgumentException(exceptionMsg);
+            throw new IllegalInputValueException(exceptionMsg);
     }
     
-    public static void nullCheck(String input, String exceptionMsg) {
+    public static void nullCheck(String input, String exceptionMsg) 
+            throws IllegalInputValueException {
         if(input == null)
-            throw new IllegalArgumentException(exceptionMsg + " is NULL");
+            throw new IllegalInputValueException(exceptionMsg + " is NULL");
     }
     
-    public static void nullCheck(Object input, String exceptionMsg) {
+    public static void nullCheck(Object input, String exceptionMsg) 
+            throws IllegalInputValueException {
         if(input == null)
-            throw new IllegalArgumentException(exceptionMsg + " is NULL");
+            throw new IllegalInputValueException(exceptionMsg + " is NULL");
     }
             
 }

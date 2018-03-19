@@ -6,7 +6,10 @@
 package com.apu.olxcrawler;
 
 import com.apu.olxcrawler.entity.ExpandedLink;
+import com.apu.olxcrawler.parser.IllegalInputValueException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
@@ -51,13 +54,19 @@ public class OlxSearchTest {
         ExpandedLink searchStr = null;
         try {
             instance.getLinkListBySearchQuery(searchStr);
-        } catch(IllegalArgumentException e) {
+        } catch(IllegalInputValueException e) {
             assertThat(e.getMessage(), is("searchStr is NULL"));
         }        
         searchStr = new ExpandedLink();
         searchStr.setInitQuery("Книга");
         searchStr.setCategory(OlxCategory.hobbi_otdyh_i_sport);
-        List<ExpandedLink> result = instance.getLinkListBySearchQuery(searchStr);
+        List<ExpandedLink> result;
+        try {
+            result = instance.getLinkListBySearchQuery(searchStr);
+        } catch (IllegalInputValueException ex) {
+            result = null;
+        }
+        assertNotNull(result);
         assertTrue(result.size() > 10);
     }
     
