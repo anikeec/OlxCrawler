@@ -7,6 +7,7 @@ package com.apu.olxcrawler;
 
 import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.parser.OlxSearchParser;
+import com.apu.olxcrawler.query.GetRequestException;
 import com.apu.olxcrawler.query.OlxRequest;
 import com.apu.olxcrawler.query.OlxResult;
 import com.apu.olxcrawler.utils.DataChecker;
@@ -15,6 +16,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -54,23 +57,28 @@ public class OlxSearch {
         return emptyList;
     }
     
-    private List<ExpandedLink> getLinkListBySearchPageLink(String link, String searchStr) {        
+    private List<ExpandedLink> getLinkListBySearchPageLink(String link, String searchStr) { 
         DataChecker.nullCheck(searchStr, "searchStr");
-        DataChecker.nullCheck(link, "link");        
+        DataChecker.nullCheck(link, "link");
         String regExpUrl = "https://www\\.olx\\.ua/(.*)";
         DataChecker.regularCheck(link, regExpUrl, "Error input link: " + link);
         
         OlxSearchParser searchParser = new OlxSearchParser();
-        String searchContent = getRequest(link);
-        Integer amountOfPages = 
-                searchParser.getAmountOfPagesFromContent(searchContent);
         List<ExpandedLink> list = new ArrayList<>();
-        list.add(new ExpandedLink(link, searchStr));
-        if(amountOfPages != null) {
-            for(int i=2; i<(amountOfPages + 1); i++) {
-                String resultLink = link + "?page=" + i;
-                list.add(new ExpandedLink(resultLink, searchStr));
-            }
+        try {
+            String searchContent = getRequest(link);
+            Integer amountOfPages =
+                    searchParser.getAmountOfPagesFromContent(searchContent);
+            
+            list.add(new ExpandedLink(link, searchStr));
+            if(amountOfPages != null) {
+                for(int i=2; i<(amountOfPages + 1); i++) {
+                    String resultLink = link + "?page=" + i;
+                    list.add(new ExpandedLink(resultLink, searchStr));
+                }
+            }            
+        } catch (GetRequestException ex) {
+            log.error(classname, ExceptionUtils.getStackTrace(ex));
         }
         return list;
     }
@@ -80,7 +88,7 @@ public class OlxSearch {
         return CLEAR_PATTERN.matcher(searchStr).replaceAll("-").trim();
     }
     
-    private String getRequest(String queryStr) { 
+    private String getRequest(String queryStr) throws GetRequestException { 
         OlxResult result = new OlxRequest().makeRequest(queryStr);
         if(result == null)
             return "";
