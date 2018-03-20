@@ -10,12 +10,20 @@ package com.apu.olxcrawler.proxy;
  * @author apu
  */
 public class ProxyItem {
+    
+    /** Proxy server IP address */
     private String ip;
+    
+    /** Proxy server port number */
     private Integer port;
-    private boolean valid = true;
-//    private boolean used = false;
-    private final int SEMAPHORE_INIT = 5;
-    private int semaphore = SEMAPHORE_INIT;
+    
+    /** Amount of clients who can use this proxy concurrently */
+    private final int USED_SEMAPHORE_INIT = 5;
+    private volatile int usedSemaphore = USED_SEMAPHORE_INIT;
+    
+    /** Amount of tries this proxy usage */
+    private final int VALID_SEMAPHORE_INIT = 2;    
+    private volatile int validSemaphore = VALID_SEMAPHORE_INIT;
 
     public ProxyItem(String ip, Integer port) {
         this.ip = ip;
@@ -38,32 +46,35 @@ public class ProxyItem {
         this.port = port;
     }
 
-    public boolean isValid() {
-        return valid;
+    public synchronized boolean isValid() {
+        if(validSemaphore > 0)
+            return true;
+        return false;
     }
 
-    public void setValid(boolean valid) {
-        this.valid = valid;
-    }
-
-    public boolean isUsed() {
-//        return used;
-        if(semaphore > 0)   return false;
-        return true;
-    }
-
-//    public void setUsed(boolean used) {
-//        this.used = used;
-//    }
-    
-    public void setUsed() {
-        if(semaphore > 0)
-            semaphore--;
+    public synchronized void setValid() {
+        if(validSemaphore < VALID_SEMAPHORE_INIT)
+            validSemaphore++;
     }
     
-    public void clearUsed() {
-        if(semaphore < SEMAPHORE_INIT)
-            semaphore++;
+    public synchronized void setInvalid() {
+        if(validSemaphore > 0)
+            validSemaphore--;
+    }
+
+    public synchronized boolean isUnused() {
+        if(usedSemaphore > 0)   return true;
+        return false;
+    }
+    
+    public synchronized void setUsed() {
+        if(usedSemaphore > 0)
+            usedSemaphore--;
+    }
+    
+    public synchronized void clearUsed() {
+        if(usedSemaphore < USED_SEMAPHORE_INIT)
+            usedSemaphore++;
     }
     
 }
