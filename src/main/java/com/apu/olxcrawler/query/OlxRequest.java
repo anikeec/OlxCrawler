@@ -36,12 +36,18 @@ public class OlxRequest {
     private final ConnectionManager connectionManager = 
                             ConnectionManager.getInstance();
     
-    public OlxResult makeRequest(String urlStr) throws GetRequestException {
+    public OlxResult makeRequest(String urlStr) throws GetRequestException {        
+        return makeRequest(urlStr, null, null);
+    }   
+    
+    public OlxResult makeRequest(String urlStr, String refererUrlStr, OlxResult previousResult) 
+                throws GetRequestException {
         HttpClientItem httpClientItem = connectionManager.getClient();
         HttpClient client = httpClientItem.getHttpClient();
-//        client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
-        GetMethod request = new GetMethod(urlStr);
-        
+        if((previousResult != null) && (refererUrlStr != null))
+            client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
+        GetMethod request = new GetMethod(urlStr);  
+
         ProxyManager proxyManager = ProxyManager.getInstance();
         ProxyItem proxy = proxyManager.take();
         if(proxy != null) {
@@ -51,27 +57,28 @@ public class OlxRequest {
         }
         
         try {
-            request.setRequestHeader(HttpHeaders.HOST, "www.olx.ua");
-            request.setRequestHeader(HttpHeaders.ACCEPT, "text/html,application/xhtml+xml,"
-                    + "application/xml;q=0.9,image/webp,image/apng,*/*");
-            request.setRequestHeader(HttpHeaders.ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
-            request.setRequestHeader(HttpHeaders.ACCEPT_ENCODING, "Accept-Encoding: gzip, deflate, br");
-            request.setRequestHeader(HttpHeaders.CONNECTION, "keep-alive");
-            request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-            request.setRequestHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 6.1; Win64; x64) "
-                    + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36");
+            if((previousResult != null) && (refererUrlStr != null)) {                
+                HttpState state = new HttpState();
+                Cookie[] cookies = 
+                        cookieItemListToCookies(previousResult.getCookieList());
+                state.addCookies(cookies);
+                client.setState(state);                
+            }
+            requestSetHeader(request, refererUrlStr);
             log.debug(classname, Thread.currentThread().getName() + " send request");
             client.executeMethod(request);
             log.debug(classname, Thread.currentThread().getName() + " get responce");
             String responseBody = request.getResponseBodyAsString();
-            Cookie[] cookies = client.getState().getCookies();
             
+            Cookie[] cookiesRet = client.getState().getCookies();
             CookieItemList cookieList = 
-                        cookiesToCookieItemList(cookies);
-
+                        cookiesToCookieItemList(cookiesRet);
+            
             return new OlxResult(responseBody, cookieList);
         } catch (IOException ex) {
-            throw new GetRequestException("gerRequestError.", ex);
+            if(proxy != null)
+                proxy.setInvalid();
+            throw new GetRequestException("gerRequestError.", ex);            
         } finally {
             proxyManager.put(proxy);
             request.releaseConnection();
@@ -79,53 +86,19 @@ public class OlxRequest {
         }
     }
     
-    public OlxResult makeRequest(String urlStr, String refererUrlStr, OlxResult previousResult) 
-                throws GetRequestException {
-        HttpClientItem httpClientItem = connectionManager.getClient();
-        HttpClient client = httpClientItem.getHttpClient();
-        client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
-        GetMethod request = new GetMethod(urlStr);
-        
-        Cookie[] cookies = 
-                        cookieItemListToCookies(previousResult.getCookieList());
-        
-        ProxyManager proxyManager = ProxyManager.getInstance();
-        ProxyItem proxy = proxyManager.take();
-        if(proxy != null) {
-            HttpHost proxyHost = new HttpHost(proxy.getIp());
-            HostConfiguration config = client.getHostConfiguration();
-            config.setProxy(proxyHost.getHostName(), proxy.getPort());
-        }
-        
-        try {
-            HttpState state = new HttpState();
-            state.addCookies(cookies);
-            client.setState(state);
-            request.setRequestHeader(HttpHeaders.HOST, "www.olx.ua");
+    private void requestSetHeader(GetMethod request, String refererUrlStr) {
+        request.setRequestHeader(HttpHeaders.HOST, "www.olx.ua");
+        if(refererUrlStr != null) {
             request.setRequestHeader(HttpHeaders.REFERER, refererUrlStr);
-            request.setRequestHeader(HttpHeaders.ACCEPT, "text/html,application/xhtml+xml,"
-                    + "application/xml;q=0.9,image/webp,image/apng,*/*");
-            request.setRequestHeader(HttpHeaders.ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
-            request.setRequestHeader(HttpHeaders.ACCEPT_ENCODING, "Accept-Encoding: gzip, deflate, br");
-            request.setRequestHeader(HttpHeaders.CONNECTION, "keep-alive");
-            request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-            request.setRequestHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 6.1; Win64; x64) "
-                    + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36");
-            log.debug(classname, Thread.currentThread().getName() + " send request");
-            client.executeMethod(request);
-            log.debug(classname, Thread.currentThread().getName() + " get responce");
-            String responseBody = request.getResponseBodyAsString();
-            Cookie[] cookiesRet = client.getState().getCookies();
-            CookieItemList cookieList = 
-                        cookiesToCookieItemList(cookiesRet);
-            return new OlxResult(responseBody, cookieList);
-        } catch (IOException ex) {
-            throw new GetRequestException("gerRequestError.", ex);
-        } finally {
-            proxyManager.put(proxy);
-            request.releaseConnection();
-            connectionManager.putClient(httpClientItem);
         }
+        request.setRequestHeader(HttpHeaders.ACCEPT, "text/html,application/xhtml+xml,"
+                + "application/xml;q=0.9,image/webp,image/apng,*/*");
+        request.setRequestHeader(HttpHeaders.ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
+        request.setRequestHeader(HttpHeaders.ACCEPT_ENCODING, "Accept-Encoding: gzip, deflate, br");
+        request.setRequestHeader(HttpHeaders.CONNECTION, "keep-alive");
+        request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        request.setRequestHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 6.1; Win64; x64) "
+                + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36");
     }
     
     private CookieItemList cookiesToCookieItemList(Cookie[] cookiesFirst) {
