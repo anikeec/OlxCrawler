@@ -10,7 +10,9 @@ import com.apu.olxcrawler.proxy.ProxyManager;
 import com.apu.olxcrawler.query.cookie.CookieItem;
 import com.apu.olxcrawler.query.cookie.CookieItemList;
 import com.apu.olxcrawler.utils.Log;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.httpclient.Cookie;
@@ -65,10 +67,20 @@ public class OlxRequest {
                 client.setState(state);                
             }
             requestSetHeader(request, refererUrlStr);
+            
             log.debug(classname, Thread.currentThread().getName() + " send request");
             client.executeMethod(request);
+            
             log.debug(classname, Thread.currentThread().getName() + " get responce");
-            String responseBody = request.getResponseBodyAsString();
+            BufferedReader breader = new BufferedReader(
+                                        new InputStreamReader(
+                                        request.getResponseBodyAsStream(), "UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while((line = breader.readLine()) != null) {
+                sb.append(line);
+            }
+            String responseBody = sb.toString();
             
             Cookie[] cookiesRet = client.getState().getCookies();
             CookieItemList cookieList = 
@@ -94,7 +106,8 @@ public class OlxRequest {
         request.setRequestHeader(HttpHeaders.ACCEPT, "text/html,application/xhtml+xml,"
                 + "application/xml;q=0.9,image/webp,image/apng,*/*");
         request.setRequestHeader(HttpHeaders.ACCEPT_LANGUAGE, "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
-        request.setRequestHeader(HttpHeaders.ACCEPT_ENCODING, "Accept-Encoding: gzip, deflate, br");
+        request.setRequestHeader(HttpHeaders.ACCEPT_CHARSET, "utf-8");
+        request.setRequestHeader(HttpHeaders.ACCEPT_ENCODING, "Accept-Encoding: gzip, deflate");
         request.setRequestHeader(HttpHeaders.CONNECTION, "keep-alive");
         request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         request.setRequestHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 6.1; Win64; x64) "
