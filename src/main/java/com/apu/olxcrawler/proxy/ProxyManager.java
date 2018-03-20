@@ -17,9 +17,7 @@ public class ProxyManager {
     
     private static final Log log = Log.getInstance();
     private final Class classname = ProxyManager.class;
-    
-//    private static final String SERVER_CHECK_PROXY = "http://www.google.com";
-//    private static final int SERVER_CHECK_TIMEOUT = 1000;
+
     /** List of available proxies */
     private final List<ProxyItem> proxyList;
     
@@ -123,44 +121,5 @@ public class ProxyManager {
         }
         return false;
     }
-    
-//    private boolean ping(ProxyItem item) {
-////        try {
-////            InetAddress address = InetAddress.getByAddress(item.getIp().getBytes());
-////            log.error(classname, "ping: " + address.isReachable(200));
-////            return true;
-////        }
-////        catch (UnknownHostException ex) { 
-////            log.error(classname, ExceptionUtils.getStackTrace(ex));
-////        }
-////        catch (IOException ex) {
-////            log.error(classname, ExceptionUtils.getStackTrace(ex));
-////        }
-//        log.debug(classname, "Check proxy: " + item.getIp() + ":" + item.getPort());
-//        Proxy proxy = new Proxy(Proxy.Type.HTTP, 
-//                new InetSocketAddress(item.getIp(), item.getPort()));
-//        URL url;
-//        try {
-//            url = new URL(SERVER_CHECK_PROXY);
-//            HttpURLConnection uc = (HttpURLConnection)url.openConnection(proxy);
-//            uc.setConnectTimeout(SERVER_CHECK_TIMEOUT);
-//            uc.setRequestMethod("GET");
-//            uc.connect();
-//            int code = uc.getResponseCode();
-//            StringBuilder tmp = new StringBuilder();
-//            BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream()));
-//            String line = in.readLine();
-//            uc.disconnect();
-//            if(code == 200)
-//                return true;
-//        } catch (MalformedURLException ex) {
-//            log.error(classname, "Check proxy error!!!");
-////            log.error(classname, ExceptionUtils.getStackTrace(ex));
-//        } catch (IOException ex) {
-//            log.error(classname, "Check proxy error!!!");   
-////            log.error(classname, ExceptionUtils.getStackTrace(ex));
-//        }        
-//        return false;
-//    }
     
 }
