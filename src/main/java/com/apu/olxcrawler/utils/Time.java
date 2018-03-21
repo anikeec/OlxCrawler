@@ -31,19 +31,26 @@ public class Time {
     }
     
     public static Date timeStrToDate(String time) {
+        if(time == null)        
+                return null;
         try {
             return dateFormat.parse(time);
         } catch (ParseException ex) {
-            log.debug(classname,ExceptionUtils.getStackTrace(ex));
+            log.error(classname,"Error input time: " + time);
+            log.error(classname,ExceptionUtils.getStackTrace(ex));
         }
         return null;
     }
     
     public static java.sql.Time timeStrToTime(String time) {
+        if(time == null)        
+                return null;
         try {
-            return new java.sql.Time(dateFormat.parse(time).getTime());
+            Date date = dateFormat.parse(time);
+            return new java.sql.Time(date.getTime());
         } catch (ParseException ex) {
-            log.debug(classname,ExceptionUtils.getStackTrace(ex));
+            log.error(classname,"Error input time: " + time);
+            log.error(classname,ExceptionUtils.getStackTrace(ex));
         }
         return null;
     }
