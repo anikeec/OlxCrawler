@@ -25,6 +25,10 @@ public class Log {
         return instance;
     }
     
+    public synchronized void info(Class className, String str) {
+        logger.info("(" + className.getName() + ") - " + str);
+    }
+    
     public synchronized void debug(Class className, String str) {
         logger.debug("(" + className.getName() + ") - " + editString(str));
     }
