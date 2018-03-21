@@ -89,6 +89,7 @@ public class OlxAnAdvertParser {
             String ret = getPatternCutOut(phoneStr, startPattern, endPattern);
             if(ret != null) {
                 ret = ret.trim();
+                ret = removeHtmlTags(ret);
                 ret = ret.replaceAll("\\s+", "");
                 ret = ret.replaceAll("[()\\-\\+]", "");
                 String regExpUrl = "(38)\\d{10}";
@@ -97,7 +98,12 @@ public class OlxAnAdvertParser {
                 if(matcher.matches() == true) {
                     ret = ret.replaceFirst("(38)", "");
                 }
-            }        
+            } 
+            
+            if((ret != null) && (ret.length() > 15)) {
+                log.error(classname, "Too long phone: " + ret);                
+                ret = ret.substring(0, 15);
+            }                
             return ret;
         } catch (GetRequestException ex) {
             log.error(classname, ExceptionUtils.getStackTrace(ex));
@@ -138,8 +144,18 @@ public class OlxAnAdvertParser {
         String startPattern = "\">";
         String endPattern = "</a>";
         String ret = getPatternCutOut(innerContent, startPattern, endPattern);
-        if(ret != null) return ret.trim();
-        else            return ret;
+        if(ret != null) {
+            ret = ret.trim();
+            ret = removeHtmlTags(ret);
+            ret = ret.trim();
+            if((ret != null) && (ret.length() > 30)) {
+                log.error(classname, "Too long name: " + ret);                
+                ret = ret.substring(0, 30);
+            } 
+            return ret;            
+        }
+        else 
+            return ret;
     }   
     
     private String getDescriptionFromContent(String content) {
@@ -190,8 +206,15 @@ public class OlxAnAdvertParser {
         startPattern = "<strong class=\"xxxx-large arranged\">";
         endPattern = "</strong>";
         ret = getPatternCutOut(innerContent, startPattern, endPattern);
-        if(ret != null) return ret.trim();
-
+        if(ret != null) {
+            ret = removeHtmlTags(ret);
+            ret = ret.trim();
+            if((ret != null) && (ret.length() > 15)) {
+                log.error(classname, "Too long price: " + ret);                
+                ret = ret.substring(0, 15);
+            } 
+            return ret;
+        }
         return ret;
     }
     
