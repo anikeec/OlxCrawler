@@ -22,6 +22,7 @@ import com.apu.olxcrawler.repository.entity.PhoneName;
 import com.apu.olxcrawler.repository.entity.PhoneNumber;
 import com.apu.olxcrawler.repository.entity.User;
 import com.apu.olxcrawler.repository.entity.UserName;
+import com.apu.olxcrawler.utils.Log;
 import com.apu.olxcrawler.utils.Time;
 import java.math.BigInteger;
 import java.util.Date;
@@ -32,7 +33,10 @@ import org.hibernate.SessionFactory;
  *
  * @author apu
  */
-public class AnAdvertKeeper {    
+public class AnAdvertKeeper {   
+    
+    private static final Log log = Log.getInstance();
+    private final Class classname = AnAdvertKeeper.class;
     
     /*
         a1 - get NAME from AnAdvert
@@ -152,11 +156,20 @@ public class AnAdvertKeeper {
             //f4 - get advert ID from AnAdvert
             String advertIdStr = advert.getId();
             //f5 - check if advert with this ID exists in DB
-            Advert adv = advertRepository.get(new BigInteger(advertIdStr));
+            Advert adv = null;
+            BigInteger advertId = null;
+            try {
+                if(advertIdStr != null) {
+                    advertId = new BigInteger(advertIdStr);
+                    adv = advertRepository.get(advertId);
+                }
+            } catch(NumberFormatException ex) {
+                log.error(classname, "Error BigInteger from advertIdStr: " + advertIdStr);
+            }
             if(adv == null) {
                 //f6  - if it doesn't exist -> create and persist it to DB
                 adv = new Advert();
-                adv.setId(new BigInteger(advertIdStr));
+                adv.setId(advertId);
                 adv.setUser(usr);
                 Long advId = advertRepository.save(adv);
                 adv.getPhoneNameCollection().add(phoneName);
@@ -173,6 +186,8 @@ public class AnAdvertKeeper {
                 check does phonenameId equal to last phonenameId from advert's phonenameCollection
                 if it is not equal then add phonenameId to advert's phonenameCollection
                 */
+                adv.setId(advertId);
+                adv.setUser(usr);
                 if(adv.getPhoneNameCollection().contains(phoneName) == false)
                     adv.getPhoneNameCollection().add(phoneName);
                 adv.setDescription(advert.getDescription());
@@ -188,7 +203,8 @@ public class AnAdvertKeeper {
             session.flush();
             session.getTransaction().commit();
         } finally {
-            if ((session!=null) && (!session.isConnected())) 
+//            if ((session!=null) && (!session.isConnected()))
+            if(session != null)
                     session.close();
         }
     }
