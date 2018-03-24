@@ -25,7 +25,7 @@ CREATE TABLE PHONE_NAME(
 CREATE TABLE ADVERT(
  advert_id  BIGINT NOT NULL AUTO_INCREMENT,
  id BIGINT,
- price varchar(10),
+ price varchar(20),
  publication_date DATE,
  publication_time TIME,
  user_id INT NOT NULL,
