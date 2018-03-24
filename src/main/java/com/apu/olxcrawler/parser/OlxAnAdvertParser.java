@@ -6,12 +6,12 @@
 package com.apu.olxcrawler.parser;
 
 import com.apu.olxcrawler.OlxCategory;
-import com.apu.olxcrawler.query.OlxRequest;
+import com.apu.olxcrawler.query.GetRequest;
 import com.apu.olxcrawler.entity.AnAdvert;
 import com.apu.olxcrawler.entity.ExpandedLink;
 import static com.apu.olxcrawler.parser.OlxParserUtils.getPatternCutOut;
 import com.apu.olxcrawler.query.GetRequestException;
-import com.apu.olxcrawler.query.OlxResult;
+import com.apu.olxcrawler.query.QueryResult;
 import com.apu.olxcrawler.utils.DataChecker;
 import com.apu.olxcrawler.utils.Log;
 import com.apu.olxcrawler.utils.Time;
@@ -35,14 +35,15 @@ public class OlxAnAdvertParser {
     private final String OLX_PHONE_URL = "ajax/misc/contact/phone/";
     private final String OLX_ADVERT_URL = "obyavlenie/";
     
-    public AnAdvert getAnAdvertFromLink(ExpandedLink link) throws GetRequestException {
+    public AnAdvert getAnAdvertFromLink(ExpandedLink link) 
+                throws GetRequestException, IllegalInputValueException {
         if(link == null) 
-            throw new IllegalArgumentException("link = NULL");
+            throw new IllegalInputValueException("Input link = NULL");
         AnAdvert advert = new AnAdvert();
         String content;
         
-        OlxRequest request = new OlxRequest();
-        OlxResult result = request.makeRequest(link.getLink());
+        GetRequest request = new GetRequest();
+        QueryResult result = request.makeRequest(link.getLink(), GetRequest.OLX_HOST);
         content = result.getContent();
         
         advert.setAuthor(getAuthorFromContent(content));
@@ -62,7 +63,7 @@ public class OlxAnAdvertParser {
         return advert;
     }
     
-    private String getPhoneFromUrlAndResult(String urlStr, OlxResult result) { 
+    private String getPhoneFromUrlAndResult(String urlStr, QueryResult result) { 
         if(urlStr == null)    return null;
         if(result == null)    return null; 
         String idStr = this.getUserIdFromLink(urlStr);
@@ -77,10 +78,10 @@ public class OlxAnAdvertParser {
         String phoneUrlStr = OlxCategory.OLX_HOST_URL + 
                                     OLX_PHONE_URL + idStr + "/?pt=" + token;
         log.debug(classname, Thread.currentThread().getName() + ": " + phoneUrlStr);
-        OlxRequest request = new OlxRequest();
+        GetRequest request = new GetRequest();
         try {
-            OlxResult phoneRequestResult = 
-                    request.makeRequest(phoneUrlStr, urlStr, result); //result.getCookies()
+            QueryResult phoneRequestResult = 
+                    request.makeRequest(phoneUrlStr, GetRequest.OLX_HOST, urlStr, result); //result.getCookies()
         
             String phoneStr = phoneRequestResult.getContent();
 
@@ -185,14 +186,17 @@ public class OlxAnAdvertParser {
         else            return ret;
     }
     
-    private String getIdFromContent(String content) {
+    private String getIdFromContent(String content) throws IllegalInputValueException {
         if(content == null) return null;
         String innerContent = getOfferTitleboxDetailsBlockFromContent(content);
         String startPattern = "<small>Номер объявления:";
         String endPattern = "</small>";
         String ret = getPatternCutOut(innerContent, startPattern, endPattern);
         if(ret != null) return ret.trim();
-        else            return ret;
+        else {
+            log.error(classname, "Advert ID error. Content.");
+            throw new IllegalInputValueException("Advert parse id error.");
+        }
     }
     
     private String getPriceFromContent(String content) {
