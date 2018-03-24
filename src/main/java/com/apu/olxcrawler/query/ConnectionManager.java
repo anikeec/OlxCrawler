@@ -25,6 +25,8 @@ public class ConnectionManager {
     private static final Log log = Log.getInstance();
     private final Class classname = ConnectionManager.class;
     
+    private static final int CONN_TIMEOUT_MS = 2000;
+    private static final int SO_TIMEOUT_MS = 5000;
     private static final int CONN_MANAGERS_AMOUNT_MAX = 10;
     private static final int MAX_CONNECTION_PER_HOST = 1;
     
@@ -41,9 +43,12 @@ public class ConnectionManager {
         for(int i=0; i<CONN_MANAGERS_AMOUNT_MAX; i++) {
             MultiThreadedHttpConnectionManager cm = 
                                 new MultiThreadedHttpConnectionManager();
+            cm.getParams().setConnectionTimeout(CONN_TIMEOUT_MS);
+            cm.getParams().setSoTimeout(SO_TIMEOUT_MS);
             cm.getParams().setDefaultMaxConnectionsPerHost(MAX_CONNECTION_PER_HOST);
             cmList.add(cm);
             HttpClient client = new HttpClient(cm);
+            client.getParams().setSoTimeout(SO_TIMEOUT_MS);
             for(int j=0; j<MAX_CONNECTION_PER_HOST; j++) {
                 try {
                     clientQueue.put(new HttpClientItem(counter, client));
