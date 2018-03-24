@@ -17,13 +17,23 @@ public class ProxyItem {
     /** Proxy server port number */
     private Integer port;
     
+    /** Proxy-server country */
+    private String country;
+    
+    /** Proxy delay, ms */
+    private Integer delay;
+    
     /** Amount of clients who can use this proxy concurrently */
-    private final int USED_SEMAPHORE_INIT = 5;
+    private final int USED_SEMAPHORE_INIT = 1;
     private volatile int usedSemaphore = USED_SEMAPHORE_INIT;
     
     /** Amount of tries this proxy usage */
-    private final int VALID_SEMAPHORE_INIT = 2;    
+    private final int VALID_SEMAPHORE_INIT = 1;    
     private volatile int validSemaphore = VALID_SEMAPHORE_INIT;
+
+    public ProxyItem() {
+        this(null, null);
+    }  
 
     public ProxyItem(String ip, Integer port) {
         this.ip = ip;
@@ -76,5 +86,23 @@ public class ProxyItem {
         if(usedSemaphore < USED_SEMAPHORE_INIT)
             usedSemaphore++;
     }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public Integer getDelay() {
+        return delay;
+    }
+
+    public void setDelay(Integer delay) {
+        this.delay = delay;
+    }
+    
+    
     
 }
