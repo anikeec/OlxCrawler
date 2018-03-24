@@ -7,16 +7,22 @@ package com.apu.olxcrawler;
 
 import com.apu.olxcrawler.entity.AnAdvert;
 import com.apu.olxcrawler.entity.ExpandedLink;
+import com.apu.olxcrawler.mainlogic.AnAdvertKeeperThread;
 import com.apu.olxcrawler.parseProcess.OlxAnAdvertParserPool;
 import com.apu.olxcrawler.parseProcess.OlxSearchLListToAdAdvertLThread;
 import com.apu.olxcrawler.parseProcess.OlxSearchPageParserPool;
 import com.apu.olxcrawler.parseProcess.SearchPageQuery;
+import com.apu.olxcrawler.parser.IllegalInputValueException;
+import com.apu.olxcrawler.proxy.ProxyGetThread;
+import com.apu.olxcrawler.proxy.ProxyManager;
 import com.apu.olxcrawler.utils.Log;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
@@ -32,11 +38,11 @@ public class Crawler {
     
     int POLL_TIMEOUT = 5;
     
-    int SEARCH_INPUT_LINK_QUEUE_SIZE = 500;
-    int SEARCH_OUTPUT_SEARCHPAGE_QUEUE_SIZE = 500;
+    int SEARCH_INPUT_LINK_QUEUE_SIZE = 10000;
+    int SEARCH_OUTPUT_SEARCHPAGE_QUEUE_SIZE = 10000;
     
-    int PARSER_INPUT_LINK_QUEUE_SIZE = 1000;
-    int PARSER_OUTPUT_ANADVERT_QUEUE_SIZE = 1000; 
+    int PARSER_INPUT_LINK_QUEUE_SIZE = 1000000;
+    int PARSER_OUTPUT_ANADVERT_QUEUE_SIZE = 1000000; 
     
     BlockingQueue<ExpandedLink> searchInputLinkQueue;
     BlockingQueue<SearchPageQuery> outputSearchPageQueue;
@@ -66,6 +72,21 @@ public class Crawler {
         searchPagePool.init();  
         parserPool.init();
         
+        ProxyManager proxyManager = new ProxyManager();
+        ProxyManager.setInstance(proxyManager);
+        proxyManager.init();
+        
+        ProxyGetThread proxyGetThread = new ProxyGetThread();
+        proxyGetThread.init();
+        proxyGetThread.start();
+        
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        while(proxyGetThread.isQueryActive()) {}
+        
         Thread thread = new Thread(
                             new OlxSearchLListToAdAdvertLThread(outputSearchPageQueue, 
                                                                 inputLinkQueue));
@@ -79,34 +100,51 @@ public class Crawler {
         
         OlxSearch olxSearch = new OlxSearch();
         
-        List<ExpandedLink> searchPagesLinkList = 
-                            olxSearch.getLinkListBySearchQuery(strToFind);
-        
-        log.error(classname, "Start");
-        
-        for(ExpandedLink link:searchPagesLinkList) {
-            try {
-                searchInputLinkQueue.put(link);
-            } catch (InterruptedException ex) {
-                log.error(classname, ExceptionUtils.getStackTrace(ex));
-            }
-        }
-        
+        List<ExpandedLink> searchPagesLinkList;
         List<AnAdvert> advertList = new ArrayList<>();
-        
-        AnAdvert advert;
-        while(true) {
-            try {
-                advert = outputAnAdvertQueue.poll(POLL_TIMEOUT, TimeUnit.SECONDS);
-                if(advert == null)
-                    break;
-                advertList.add(advert);
-            } catch (InterruptedException ex) {
-                log.error(classname, ExceptionUtils.getStackTrace(ex));
+        try {
+            searchPagesLinkList = olxSearch.getLinkListBySearchQuery(strToFind);
+            log.info(classname, "Seach str: " + strToFind.getInitQuery() + 
+                    ". Found: " + searchPagesLinkList.size() + " links");
+            for(ExpandedLink link:searchPagesLinkList) {
+                try {
+                    searchInputLinkQueue.put(link);
+                } catch (InterruptedException ex) {
+                    log.error(classname, ExceptionUtils.getStackTrace(ex));
+                }
             }
+
+            AnAdvertKeeperThread keeperThread = 
+                            new AnAdvertKeeperThread(outputAnAdvertQueue);
+            keeperThread.setDaemon(true);
+            keeperThread.start();           
+            while(true){}
+//            try {
+//                Thread.sleep(60000);
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+        } catch (IllegalInputValueException ex) {
+            Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        log.error(classname, "Finish");
+        log.debug(classname, "Start");
+        
+        
+        
+//        AnAdvert advert;
+//        while(true) {
+//            try {
+//                advert = outputAnAdvertQueue.poll(POLL_TIMEOUT, TimeUnit.SECONDS);
+//                if(advert == null)
+//                    break;
+//                advertList.add(advert);
+//            } catch (InterruptedException ex) {
+//                log.error(classname, ExceptionUtils.getStackTrace(ex));
+//            }
+//        }
+        
+        log.debug(classname, "Finish");
         
         System.out.println("Ready");
         
