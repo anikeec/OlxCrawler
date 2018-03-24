@@ -8,6 +8,7 @@ package com.apu.olxcrawler.parseProcess;
 import com.apu.olxcrawler.parser.OlxAnAdvertParser;
 import com.apu.olxcrawler.entity.AnAdvert;
 import com.apu.olxcrawler.entity.ExpandedLink;
+import com.apu.olxcrawler.parser.IllegalInputValueException;
 import com.apu.olxcrawler.query.GetRequestException;
 import com.apu.olxcrawler.utils.Log;
 import java.util.concurrent.BlockingQueue;
@@ -41,11 +42,17 @@ public class OlxAnAdvertParserThread implements Runnable {
                 ExpandedLink link = inputLinkQueue.take();
                 log.debug(classname, Thread.currentThread().getName() + " take link.");
                 AnAdvert advert = parser.getAnAdvertFromLink(link);
-                log.debug(classname, Thread.currentThread().getName() + " put advert.");
-                outputAnAdvertQueue.put(advert);
+                if(advert.getId() != null) {
+                    log.debug(classname, Thread.currentThread().getName() + " put advert.");
+                    outputAnAdvertQueue.put(advert);
+                } else {
+                    log.error(classname, Thread.currentThread().getName() + "Put advert error. Advert id is null.");
+                }
             } catch (InterruptedException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));
-            } catch (GetRequestException ex) {
+            } catch (GetRequestException | IllegalInputValueException ex) {
+                log.error(classname, ExceptionUtils.getStackTrace(ex));
+            } catch (RuntimeException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));
             }
         }
