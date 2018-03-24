@@ -13,11 +13,11 @@ import com.apu.olxcrawler.query.cookie.CookieItemList;
  * @email  pasha_anik@ukr.net
  * 
  */
-public class OlxResult {
+public class QueryResult {
     private String content;
     private CookieItemList cookieList = null;
 
-    public OlxResult(String content, CookieItemList cookieList) {
+    public QueryResult(String content, CookieItemList cookieList) {
         this.content = content;
         this.cookieList = cookieList;
     } 

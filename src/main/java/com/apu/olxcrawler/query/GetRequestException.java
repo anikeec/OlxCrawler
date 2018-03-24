@@ -17,4 +17,8 @@ public class GetRequestException extends IOException {
         super(message, cause);
     }
     
+    public GetRequestException(String message) {
+        super(message);
+    }
+    
 }

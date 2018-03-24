@@ -8,7 +8,7 @@ package com.apu.olxcrawler.parseProcess;
 import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.parser.OlxSearchParser;
 import com.apu.olxcrawler.query.GetRequestException;
-import com.apu.olxcrawler.query.OlxRequest;
+import com.apu.olxcrawler.query.GetRequest;
 import com.apu.olxcrawler.utils.Log;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -44,10 +44,11 @@ public class OlxSearchPageParserThread implements Runnable {
                 log.debug(classname, Thread.currentThread().getName() + " take link.");
                 
                 String content = 
-                        new OlxRequest().makeRequest(searchPageLink.getLink()).getContent();
+                        new GetRequest().makeRequest(searchPageLink.getLink(), GetRequest.OLX_HOST).getContent();
                 
                 List<String> linkList = parser.parseSearchResultOnePage(content);
-                
+                log.info(classname, "Search link: " + searchPageLink.getLink() + 
+                                    " Found links: " + linkList.size());
                 SearchPageQuery searchResult = 
                         new SearchPageQuery(searchPageLink.getLink(), 
                                             linkList,

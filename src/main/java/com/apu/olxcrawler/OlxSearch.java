@@ -9,8 +9,8 @@ import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.parser.IllegalInputValueException;
 import com.apu.olxcrawler.parser.OlxSearchParser;
 import com.apu.olxcrawler.query.GetRequestException;
-import com.apu.olxcrawler.query.OlxRequest;
-import com.apu.olxcrawler.query.OlxResult;
+import com.apu.olxcrawler.query.GetRequest;
+import com.apu.olxcrawler.query.QueryResult;
 import com.apu.olxcrawler.utils.DataChecker;
 import com.apu.olxcrawler.utils.Log;
 import java.io.UnsupportedEncodingException;
@@ -92,7 +92,7 @@ public class OlxSearch {
     }
     
     private String getRequest(String queryStr) throws GetRequestException { 
-        OlxResult result = new OlxRequest().makeRequest(queryStr);
+        QueryResult result = new GetRequest().makeRequest(queryStr, GetRequest.OLX_HOST);
         if(result == null)
             return "";
         return result.getContent();
