@@ -36,11 +36,6 @@ public class OlxPhoneNumberParserThread implements Runnable {
         this.inputQueryQueue = inputQueryQueue;
         this.outputAnAdvertQueue = outputAnAdvertQueue;
     }
-    
-//    public void init() {
-//        this.setName("OlxPhoneNumberParserThread");
-//        this.setDaemon(true);
-//    }
 
     @Override
     public void run() {
