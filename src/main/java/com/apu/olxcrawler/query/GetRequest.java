@@ -177,7 +177,8 @@ public class GetRequest {
             }
             throw new GetRequestException("gerRequestError.", ex);            
         } finally {
-            proxyManager.put(proxy);
+            if(proxyManager != null)
+                proxyManager.put(proxy);
             request.releaseConnection();
             connectionManager.putClient(httpClientItem);
         }
