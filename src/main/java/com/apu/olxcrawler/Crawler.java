@@ -9,13 +9,16 @@ import com.apu.olxcrawler.entity.AnAdvert;
 import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.mainlogic.AnAdvertKeeperThread;
 import com.apu.olxcrawler.parseProcess.OlxAnAdvertParserPool;
+import com.apu.olxcrawler.parseProcess.OlxPhoneNumberParserThread;
 import com.apu.olxcrawler.parseProcess.OlxSearchLListToAdAdvertLThread;
 import com.apu.olxcrawler.parseProcess.OlxSearchPageParserPool;
+import com.apu.olxcrawler.parseProcess.PhoneNumberQuery;
 import com.apu.olxcrawler.parseProcess.SearchPageQuery;
 import com.apu.olxcrawler.parser.IllegalInputValueException;
 import com.apu.olxcrawler.proxy.ProxyGetThread;
 import com.apu.olxcrawler.proxy.ProxyManager;
 import com.apu.olxcrawler.utils.Log;
+import com.apu.olxcrawler.utils.ThreadPool;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -42,14 +45,18 @@ public class Crawler {
     int SEARCH_OUTPUT_SEARCHPAGE_QUEUE_SIZE = 10000;
     
     int PARSER_INPUT_LINK_QUEUE_SIZE = 1000000;
-    int PARSER_OUTPUT_ANADVERT_QUEUE_SIZE = 1000000; 
+    int PARSER_OUTPUT_ANADVERT_QUEUE_SIZE = 1000000;
+    int PARSER_OUTPUT_PHONE_QUEUE_SIZE = 1000;
+    
+    private int PHONE_NUMBER_POOL_SIZE = 1;
     
     BlockingQueue<ExpandedLink> searchInputLinkQueue;
     BlockingQueue<SearchPageQuery> outputSearchPageQueue;
     OlxSearchPageParserPool searchPagePool;
     
     BlockingQueue<ExpandedLink> inputLinkQueue;
-    BlockingQueue<AnAdvert> outputAnAdvertQueue;        
+    BlockingQueue<AnAdvert> outputAnAdvertQueue;
+    private final BlockingQueue<PhoneNumberQuery> outputQueryQueue;
     OlxAnAdvertParserPool parserPool;
 
     public Crawler() {
@@ -61,8 +68,10 @@ public class Crawler {
                 new ArrayBlockingQueue<>(SEARCH_OUTPUT_SEARCHPAGE_QUEUE_SIZE);
         this.searchInputLinkQueue = 
                 new ArrayBlockingQueue<>(SEARCH_INPUT_LINK_QUEUE_SIZE);
+        this.outputQueryQueue = 
+                new ArrayBlockingQueue<>(PARSER_OUTPUT_PHONE_QUEUE_SIZE);
         this.parserPool = 
-                new OlxAnAdvertParserPool(inputLinkQueue, outputAnAdvertQueue);        
+                new OlxAnAdvertParserPool(inputLinkQueue, outputAnAdvertQueue, outputQueryQueue);        
         this.searchPagePool = 
                 new OlxSearchPageParserPool(searchInputLinkQueue, outputSearchPageQueue);        
     }    
@@ -71,6 +80,16 @@ public class Crawler {
     public void init() {         
         searchPagePool.init();  
         parserPool.init();
+        
+        ThreadPool phoneNumberThreadPool = new ThreadPool(PHONE_NUMBER_POOL_SIZE);
+        OlxPhoneNumberParserThread phoneNumberParserThread;
+        for(int i=0; i<PHONE_NUMBER_POOL_SIZE; i++) {
+            phoneNumberParserThread = 
+                new OlxPhoneNumberParserThread(outputQueryQueue, outputAnAdvertQueue);
+            phoneNumberThreadPool.submit(phoneNumberParserThread, "OlxPhoneNumberParserThread " + (i + 1));
+        }        
+//        phoneNumberParserThread.init();
+//        phoneNumberParserThread.start();
         
         ProxyManager proxyManager = new ProxyManager();
         ProxyManager.setInstance(proxyManager);

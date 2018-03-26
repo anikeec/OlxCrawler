@@ -96,6 +96,78 @@ public class AnAdvertKeeper {
             
             session.beginTransaction();
             
+            if(advert.getPhone() != null) {
+                /*
+                if it is only phone number:
+                a - get advertId
+                b - find appropriate advert in the ADVERT
+                c - set phoneNumber
+                */
+                //c1 - get PHONE&NAME from AnAdvert
+                String nameStr = advert.getAuthor();
+                String phoneStr = advert.getPhone();
+                
+                //c2 - chech if this combination exists in DB
+                PhoneName phoneName = pNameRepository.get(nameStr, phoneStr);
+                if(phoneName == null) {
+                    //c3  - if it doesn't exist -> a1, b1, create PHONENAME, fill date and persist its to DB, load phonenameId
+                    //a1 - get NAME from AnAdvert
+                    //a2 - chech if it exists in DB
+                    UserName uName = uNameRepository.get(nameStr);
+                    Integer uNameId;
+                    if(uName == null) {
+                        //a3  - if it doesn't exist -> create and persist its to DB, load usernameId
+                        uName = new UserName();
+                        uName.setName(nameStr);
+                        uNameId = uNameRepository.save(uName);
+                    }
+
+                    //b1 - get PHONE from AnAdvert
+                    //b2 - chech if it exists in DB
+                    PhoneNumber pNumber = pNumberRepository.get(phoneStr);
+                    Integer pNumberId;
+                    if(pNumber == null) {
+                        //b3  - if it doesn't exist -> create and persist its to DB, load phoneId
+                        pNumber = new PhoneNumber();
+                        pNumber.setNumber(phoneStr);
+                        pNumberId = pNumberRepository.save(pNumber);
+                    }
+
+                    phoneName = new PhoneName();
+                    phoneName.setUserName(uName);
+                    phoneName.setPhoneNumber(pNumber);
+                    phoneName.setDate(new Date());
+                    Integer phoneNameId = pNameRepository.save(phoneName);
+                }
+                
+                //f1 - get phonenameId from c1
+                //f2 - get userId from d1
+                //f3 - get other info from AnAdvert
+                //f4 - get advert ID from AnAdvert
+                String advertIdStr = advert.getId();
+                //f5 - check if advert with this ID exists in DB
+                Advert adv = null;
+                BigInteger advertId = null;
+                try {
+                    if(advertIdStr != null) {
+                        advertId = new BigInteger(advertIdStr);
+                        adv = advertRepository.get(advertId);
+                    }
+                } catch(NumberFormatException ex) {
+                    log.error(classname, "Error BigInteger from advertIdStr: " + advertIdStr);
+                }
+                
+                if(adv != null) {
+                    /* f7  - if it exists -> check other info and change it if there is a need,
+                    check does phonenameId equal to last phonenameId from advert's phonenameCollection
+                    if it is not equal then add phonenameId to advert's phonenameCollection
+                    */
+                    if(adv.getPhoneNameCollection().contains(phoneName) == false)
+                        adv.getPhoneNameCollection().add(phoneName);
+                }               
+                
+            } else {
+            
             //c1 - get PHONE&NAME from AnAdvert
             String nameStr = advert.getAuthor();
             String phoneStr = advert.getPhone();
@@ -200,6 +272,7 @@ public class AnAdvertKeeper {
                 adv.setUserSince(Time.timeStrToDate(advert.getUserSince()));
             }
             
+            }
             session.flush();
             session.getTransaction().commit();
         } finally {

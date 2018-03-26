@@ -27,16 +27,20 @@ public class OlxAnAdvertParserThread implements Runnable {
 
     private final BlockingQueue<ExpandedLink> inputLinkQueue;
     private final BlockingQueue<AnAdvert> outputAnAdvertQueue;
+    private final BlockingQueue<PhoneNumberQuery> outputQueryQueue;
 
-    public OlxAnAdvertParserThread(BlockingQueue<ExpandedLink> inputLinkQueue, BlockingQueue<AnAdvert> outputAnAdvertQueue) {
+    public OlxAnAdvertParserThread(BlockingQueue<ExpandedLink> inputLinkQueue, 
+                        BlockingQueue<AnAdvert> outputAnAdvertQueue,
+                        BlockingQueue<PhoneNumberQuery> outputQueryQueue) {
         this.inputLinkQueue = inputLinkQueue;
         this.outputAnAdvertQueue = outputAnAdvertQueue;
+        this.outputQueryQueue = outputQueryQueue;
     }
     
     @Override
     public void run() {
         OlxAnAdvertParser parser;
-        parser = new OlxAnAdvertParser();
+        parser = new OlxAnAdvertParser(outputQueryQueue);
         while(Thread.currentThread().isInterrupted() == false) {
             try {
                 ExpandedLink link = inputLinkQueue.take();

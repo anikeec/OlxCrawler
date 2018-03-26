@@ -9,6 +9,7 @@ import com.apu.olxcrawler.OlxCategory;
 import com.apu.olxcrawler.query.GetRequest;
 import com.apu.olxcrawler.entity.AnAdvert;
 import com.apu.olxcrawler.entity.ExpandedLink;
+import com.apu.olxcrawler.parseProcess.PhoneNumberQuery;
 import static com.apu.olxcrawler.parser.OlxParserUtils.getPatternCutOut;
 import com.apu.olxcrawler.query.GetRequestException;
 import com.apu.olxcrawler.query.QueryResult;
@@ -17,6 +18,9 @@ import com.apu.olxcrawler.utils.Log;
 import com.apu.olxcrawler.utils.Time;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.BlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -32,8 +36,14 @@ public class OlxAnAdvertParser {
     private static final Log log = Log.getInstance();
     private final Class classname = OlxAnAdvertParser.class;    
         
-    private final String OLX_PHONE_URL = "ajax/misc/contact/phone/";
-    private final String OLX_ADVERT_URL = "obyavlenie/";
+    public static final String OLX_PHONE_URL = "ajax/misc/contact/phone/";
+    public static final String OLX_ADVERT_URL = "obyavlenie/";
+    
+    private final BlockingQueue<PhoneNumberQuery> outputQueryQueue;
+
+    public OlxAnAdvertParser(BlockingQueue<PhoneNumberQuery> outputQueryQueue) {
+        this.outputQueryQueue = outputQueryQueue;
+    }
     
     public AnAdvert getAnAdvertFromLink(ExpandedLink link) 
                 throws GetRequestException, IllegalInputValueException {
@@ -54,65 +64,24 @@ public class OlxAnAdvertParser {
         advert.setPrice(getPriceFromContent(content));
         advert.setPublicationDate(getPublicationDateFromContent(content));
         advert.setRegion(getRegionFromContent(content));
-        advert.setPhone(getPhoneFromUrlAndResult(link.getLink(), result));
+        advert.setPhone(null);
         advert.setUserId(getUserIdFromLink(link.getLink()));
         advert.setUserOffers(getUserOffersFromContent(content));
         advert.setUserSince(getUserSinceFromContent(content));
         advert.setInitQuery(link.getInitQuery());
         
+        try {
+            outputQueryQueue.put(new PhoneNumberQuery(advert, result));
+        } catch (InterruptedException ex) {
+            log.error(classname, ExceptionUtils.getStackTrace(ex));
+        }
+        
         return advert;
     }
     
-    private String getPhoneFromUrlAndResult(String urlStr, QueryResult result) { 
-        if(urlStr == null)    return null;
-        if(result == null)    return null; 
-        String idStr = this.getUserIdFromLink(urlStr);
-        if(idStr == null)   
-                return null;               
-        
-        String token = getTokenFromContent(result.getContent());
-        if(token == null) {
-            log.debug(classname, Thread.currentThread().getName() + ": token = NULL");
-            return null;
-        }
-        String phoneUrlStr = OlxCategory.OLX_HOST_URL + 
-                                    OLX_PHONE_URL + idStr + "/?pt=" + token;
-        log.debug(classname, Thread.currentThread().getName() + ": " + phoneUrlStr);
-        GetRequest request = new GetRequest();
-        try {
-            QueryResult phoneRequestResult = 
-                    request.makeRequest(phoneUrlStr, GetRequest.OLX_HOST, urlStr, result); //result.getCookies()
-        
-            String phoneStr = phoneRequestResult.getContent();
-
-            String startPattern = "{\"value\":\"";
-            String endPattern = "\"}";
-            String ret = getPatternCutOut(phoneStr, startPattern, endPattern);
-            if(ret != null) {
-                ret = ret.trim();
-                ret = removeHtmlTags(ret);
-                ret = ret.replaceAll("\\s+", "");
-                ret = ret.replaceAll("[()\\-\\+]", "");
-                String regExpUrl = "(38)\\d{10}";
-                Pattern pattern = Pattern.compile(regExpUrl, Pattern.DOTALL);
-                Matcher matcher = pattern.matcher(ret);        
-                if(matcher.matches() == true) {
-                    ret = ret.replaceFirst("(38)", "");
-                }
-            } 
-            
-            if((ret != null) && (ret.length() > 15)) {
-                log.error(classname, "Too long phone: " + ret);                
-                ret = ret.substring(0, 15);
-            }                
-            return ret;
-        } catch (GetRequestException ex) {
-            log.error(classname, ExceptionUtils.getStackTrace(ex));
-        }
-        return null;
-    }
     
-    private String getUserIdFromLink(String link) {
+    
+    public static String getUserIdFromLink(String link) {
         if(link == null)    return null;
         String regExpUrl = "https://www\\.olx\\.ua/" + 
                             OLX_ADVERT_URL + "(.*)\\-ID(.*)\\.html(.*)";    
@@ -124,19 +93,6 @@ public class OlxAnAdvertParser {
         String startPattern = "-ID";
         String endPattern = ".html";
         return getPatternCutOut(link, startPattern, endPattern);    
-    }
-    
-    public String getTokenFromContent(String content) {
-        if(content == null) return null;
-        String regExpUrl = "(.*)var phoneToken = \\'(.*)\\';(.*)";    
-        Pattern pattern = Pattern.compile(regExpUrl, Pattern.DOTALL);  
-        
-        Matcher matcher = pattern.matcher(content);        
-        if(matcher.matches() == false) return null;
-        
-        String startPattern = "var phoneToken = '";
-        String endPattern = "';";
-        return getPatternCutOut(content, startPattern, endPattern);        
     }
     
     private String getAuthorFromContent(String content) {
@@ -314,7 +270,7 @@ public class OlxAnAdvertParser {
         return getPatternCutOut(content, startPattern, endPattern);
     }
     
-    private String removeHtmlTags(String content) {
+    public static String removeHtmlTags(String content) {
         if(content == null) return null;
         //String ret = Jsoup.parse(content).text();
         return content.replaceAll("\\<[^>]{1,10}?>","")
