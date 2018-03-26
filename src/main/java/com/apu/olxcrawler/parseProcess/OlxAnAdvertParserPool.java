@@ -19,7 +19,7 @@ import java.util.concurrent.BlockingQueue;
  */
 public class OlxAnAdvertParserPool {    
     
-    private static final int THREAD_POOL_SIZE = 5;
+    private static final int THREAD_POOL_SIZE = 3;
     
     private final List<Thread> threadList;
     private final BlockingQueue<ExpandedLink> inputLinkQueue;

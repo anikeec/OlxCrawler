@@ -29,6 +29,7 @@ public class OlxPhoneNumberParserThread implements Runnable {
     
     private final BlockingQueue<PhoneNumberQuery> inputQueryQueue;
     private final BlockingQueue<AnAdvert> outputAnAdvertQueue;
+    private final int QUERY_TRY_COUNTER_MAX = 5;
 
     public OlxPhoneNumberParserThread(
                         BlockingQueue<PhoneNumberQuery> inputQueryQueue, 
@@ -47,10 +48,12 @@ public class OlxPhoneNumberParserThread implements Runnable {
                 query = inputQueryQueue.take();
                 if((query == null) || (query.getAnAdvert() == null)) 
                     continue;
-                phoneNumber = getPhoneFromUrlAndResult(query.getAnAdvert().getLink(),
-                                            query.getPreviousQueryResult());
-                if(phoneNumber == null) 
-                    continue;
+                int counter = 0;
+                do{
+                    phoneNumber = getPhoneFromUrlAndResult(query.getAnAdvert().getLink(),
+                                                query.getPreviousQueryResult());
+                    counter++;
+                } while((phoneNumber == null)&&(counter<QUERY_TRY_COUNTER_MAX));
                 anAdvert = new AnAdvert();
                 anAdvert.setId(query.getAnAdvert().getId());
                 anAdvert.setAuthor(query.getAnAdvert().getAuthor());
@@ -89,10 +92,14 @@ public class OlxPhoneNumberParserThread implements Runnable {
             String endPattern = "\"}";
             String ret = getPatternCutOut(phoneStr, startPattern, endPattern);
             if(ret != null) {
-                ret = ret.trim();
+                ret = ret.trim();                
                 ret = OlxAnAdvertParser.removeHtmlTags(ret);
                 ret = ret.replaceAll("\\s+", "");
                 ret = ret.replaceAll("[()\\-\\+]", "");
+                if(ret.contains("000000")) {
+                    log.info(classname, "Phone number request error: " + ret);
+                    return null;
+                }
                 String regExpUrl = "(38)\\d{10}";
                 Pattern pattern = Pattern.compile(regExpUrl, Pattern.DOTALL);
                 Matcher matcher = pattern.matcher(ret);        
