@@ -70,11 +70,13 @@ public class OlxAnAdvertParser {
         advert.setUserSince(getUserSinceFromContent(content));
         advert.setInitQuery(link.getInitQuery());
         
-        try {
-            outputQueryQueue.put(new PhoneNumberQuery(advert, result));
-        } catch (InterruptedException ex) {
-            log.error(classname, ExceptionUtils.getStackTrace(ex));
-        }
+        
+        advert.setPreviousQueryResult(result);        
+//        try {
+//            outputQueryQueue.put(new PhoneNumberQuery(advert, result));
+//        } catch (InterruptedException ex) {
+//            log.error(classname, ExceptionUtils.getStackTrace(ex));
+//        }
         
         return advert;
     }

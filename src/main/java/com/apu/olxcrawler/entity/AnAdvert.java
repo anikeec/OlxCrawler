@@ -5,6 +5,8 @@
  */
 package com.apu.olxcrawler.entity;
 
+import com.apu.olxcrawler.query.QueryResult;
+
 /**
  *
  * @author Anikeichyk Pavel
@@ -26,6 +28,7 @@ public class AnAdvert {
     private String userOffers;
     private String userSince;
     private String initQuery;
+    private QueryResult previousQueryResult;
 
     public String getAuthor() {
         return author;
@@ -129,6 +132,14 @@ public class AnAdvert {
 
     public void setInitQuery(String initQuery) {
         this.initQuery = initQuery;
+    }
+
+    public QueryResult getPreviousQueryResult() {
+        return previousQueryResult;
+    }
+
+    public void setPreviousQueryResult(QueryResult previousQueryResult) {
+        this.previousQueryResult = previousQueryResult;
     }
     
 }

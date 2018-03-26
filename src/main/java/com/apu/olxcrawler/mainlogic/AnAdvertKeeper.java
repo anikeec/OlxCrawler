@@ -6,6 +6,7 @@
 package com.apu.olxcrawler.mainlogic;
 
 import com.apu.olxcrawler.entity.AnAdvert;
+import com.apu.olxcrawler.parseProcess.PhoneNumberQuery;
 import com.apu.olxcrawler.repository.AdvertRepository;
 import com.apu.olxcrawler.repository.ORM.AdvertRepositoryHB;
 import com.apu.olxcrawler.repository.ORM.HibernateUtil;
@@ -77,7 +78,8 @@ public class AnAdvertKeeper {
         
     */   
     
-    public void keepAnAdvert(AnAdvert advert) {
+    public PhoneNumberQuery keepAnAdvert(AnAdvert advert) {
+        PhoneNumberQuery returnQuery = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = null;
         try {
@@ -167,6 +169,31 @@ public class AnAdvertKeeper {
                 }               
                 
             } else {
+                
+                //check if this advert exists
+                String advertIdString = advert.getId();
+                //f5 - check if advert with this ID exists in DB
+                Advert advTemp = null;
+                BigInteger advertIdTemp = null;
+                try {
+                    if(advertIdString != null) {
+                        advertIdTemp = new BigInteger(advertIdString);
+                        advTemp = advertRepository.get(advertIdTemp);
+                    }
+                } catch(NumberFormatException ex) {
+                    log.error(classname, "Error BigInteger from advertIdStr: " + advertIdString);
+                }
+                if(advTemp != null) {
+                    if(advTemp.getPhoneNameCollection().isEmpty()) {
+                        log.info(classname, "Advert doesn't have phone. ID: " + advTemp.getId());
+                        returnQuery = new PhoneNumberQuery(advert, advert.getPreviousQueryResult());
+                    }
+                    session.flush();
+                    session.getTransaction().commit();
+                    return returnQuery;
+                }
+                
+                
             
             //c1 - get PHONE&NAME from AnAdvert
             String nameStr = advert.getAuthor();
@@ -272,6 +299,8 @@ public class AnAdvertKeeper {
                 adv.setUserSince(Time.timeStrToDate(advert.getUserSince()));
             }
             
+            returnQuery = new PhoneNumberQuery(advert, advert.getPreviousQueryResult());
+            
             }
             session.flush();
             session.getTransaction().commit();
@@ -280,6 +309,7 @@ public class AnAdvertKeeper {
             if(session != null)
                     session.close();
         }
+        return returnQuery;
     }
     
     public static void main(String[] args) {

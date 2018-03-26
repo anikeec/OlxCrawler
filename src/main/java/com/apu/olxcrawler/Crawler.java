@@ -48,7 +48,7 @@ public class Crawler {
     int PARSER_OUTPUT_ANADVERT_QUEUE_SIZE = 1000000;
     int PARSER_OUTPUT_PHONE_QUEUE_SIZE = 1000;
     
-    private int PHONE_NUMBER_POOL_SIZE = 1;
+    private int PHONE_NUMBER_POOL_SIZE = 3;
     
     BlockingQueue<ExpandedLink> searchInputLinkQueue;
     BlockingQueue<SearchPageQuery> outputSearchPageQueue;
@@ -88,8 +88,6 @@ public class Crawler {
                 new OlxPhoneNumberParserThread(outputQueryQueue, outputAnAdvertQueue);
             phoneNumberThreadPool.submit(phoneNumberParserThread, "OlxPhoneNumberParserThread " + (i + 1));
         }        
-//        phoneNumberParserThread.init();
-//        phoneNumberParserThread.start();
         
         ProxyManager proxyManager = new ProxyManager();
         ProxyManager.setInstance(proxyManager);
@@ -134,7 +132,7 @@ public class Crawler {
             }
 
             AnAdvertKeeperThread keeperThread = 
-                            new AnAdvertKeeperThread(outputAnAdvertQueue);
+                            new AnAdvertKeeperThread(outputAnAdvertQueue, outputQueryQueue);
             keeperThread.setDaemon(true);
             keeperThread.start();           
             while(true){}
