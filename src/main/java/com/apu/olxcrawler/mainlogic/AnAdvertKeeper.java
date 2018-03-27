@@ -96,14 +96,14 @@ public class AnAdvertKeeper {
             UserRepository userRepository =
                     new UserRepositoryHB(session);
             
-            if(advert.getPhone().equals("")) {
-                log.info(classname, "User doesn't have phone");
-                return null;
-            }
+//            if((advert.getPhone() != null)&&(advert.getPhone().equals(""))) {
+//                log.info(classname, "User doesn't have phone");
+//                return null;
+//            }
             
             session.beginTransaction();
             
-            if(advert.getPhone() != null) {
+            if((advert.getPhone() != null)&&(advert.getPhone().equals("") == false)) {
                 /*
                 if it is only phone number:
                 a - get advertId

@@ -38,11 +38,8 @@ public class OlxAnAdvertParser {
         
     public static final String OLX_PHONE_URL = "ajax/misc/contact/phone/";
     public static final String OLX_ADVERT_URL = "obyavlenie/";
-    
-    private final BlockingQueue<PhoneNumberQuery> outputQueryQueue;
 
-    public OlxAnAdvertParser(BlockingQueue<PhoneNumberQuery> outputQueryQueue) {
-        this.outputQueryQueue = outputQueryQueue;
+    public OlxAnAdvertParser() {
     }
     
     public AnAdvert getAnAdvertFromLink(ExpandedLink link) 
@@ -184,8 +181,8 @@ public class OlxAnAdvertParser {
         if(content == null) return null;
         String innerContent = getPhoneLabelBlockFromContent(content);
         if(innerContent != null)
-            return "";
-        return null;
+            return null;    //we have to query phone
+        return "";          //user hasn't phone
     }
     
     private String getPublicationDateFromContent(String content) {
