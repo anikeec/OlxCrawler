@@ -38,7 +38,9 @@ public class OlxSearchLListToAdAdvertLThread implements Runnable {
         while(Thread.currentThread().isInterrupted() == false) {
             try {
                 spQuery = inputSearchPageQueue.take();
+                log.info(classname, "Input searchOutputPageQueue: " + inputSearchPageQueue.size());
                 List<String> linkList = spQuery.getLinkList();
+                log.info(classname, "Output searchOutputPageQueue. Put to queue: " + linkList.size());
                 for(String link:linkList) {
                     outputLinkQueue.put(new ExpandedLink(link, spQuery.getInitQuery()));
                 }

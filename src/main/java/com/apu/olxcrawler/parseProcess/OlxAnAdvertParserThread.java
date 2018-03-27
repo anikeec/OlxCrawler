@@ -27,32 +27,27 @@ public class OlxAnAdvertParserThread implements Runnable {
 
     private final BlockingQueue<ExpandedLink> inputLinkQueue;
     private final BlockingQueue<AnAdvert> outputAnAdvertQueue;
-    private final BlockingQueue<PhoneNumberQuery> outputQueryQueue;
 
     public OlxAnAdvertParserThread(BlockingQueue<ExpandedLink> inputLinkQueue, 
-                        BlockingQueue<AnAdvert> outputAnAdvertQueue,
-                        BlockingQueue<PhoneNumberQuery> outputQueryQueue) {
+                        BlockingQueue<AnAdvert> outputAnAdvertQueue) {
         this.inputLinkQueue = inputLinkQueue;
         this.outputAnAdvertQueue = outputAnAdvertQueue;
-        this.outputQueryQueue = outputQueryQueue;
     }
     
     @Override
     public void run() {
         OlxAnAdvertParser parser;
-        parser = new OlxAnAdvertParser(outputQueryQueue);
+        parser = new OlxAnAdvertParser();
         int querySize = 0;
         while(Thread.currentThread().isInterrupted() == false) {
             try {
                 ExpandedLink link = inputLinkQueue.take();
-                if(querySize != inputLinkQueue.size()) {
-                    querySize = inputLinkQueue.size();
-                    log.info(classname, "AnAdvertQueue - amount of data: " + querySize);
-                }
+                log.info(classname, "Input searchOutputLinkQueue: " + inputLinkQueue.size());
                 log.debug(classname, Thread.currentThread().getName() + " take link.");
                 AnAdvert advert = parser.getAnAdvertFromLink(link);
                 if(advert.getId() != null) {
                     log.debug(classname, Thread.currentThread().getName() + " put advert.");
+                    log.info(classname, "Output anAdvertParserOutputQueue: " + outputAnAdvertQueue.size());
                     outputAnAdvertQueue.put(advert);
                 } else {
                     log.error(classname, Thread.currentThread().getName() + "Put advert error. Advert id is null.");

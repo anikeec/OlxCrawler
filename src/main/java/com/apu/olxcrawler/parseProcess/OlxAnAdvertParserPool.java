@@ -24,15 +24,12 @@ public class OlxAnAdvertParserPool {
     private final List<Thread> threadList;
     private final BlockingQueue<ExpandedLink> inputLinkQueue;
     private final BlockingQueue<AnAdvert> outputAnAdvertQueue;
-    private final BlockingQueue<PhoneNumberQuery> outputQueryQueue;
 
     public OlxAnAdvertParserPool(BlockingQueue<ExpandedLink> inputLinkQueue, 
-                            BlockingQueue<AnAdvert> outputAnAdvertQueue,
-                            BlockingQueue<PhoneNumberQuery> outputQueryQueue) {
+                            BlockingQueue<AnAdvert> outputAnAdvertQueue) {
         this.threadList = new ArrayList<>();
         this.inputLinkQueue = inputLinkQueue;
         this.outputAnAdvertQueue = outputAnAdvertQueue;
-        this.outputQueryQueue = outputQueryQueue;
     }
     
     public void init() {
@@ -40,8 +37,7 @@ public class OlxAnAdvertParserPool {
         Thread thread;
         for(int i=0; i<THREAD_POOL_SIZE; i++) {
             olxThread = new OlxAnAdvertParserThread(inputLinkQueue, 
-                                                    outputAnAdvertQueue,
-                                                    outputQueryQueue);
+                                                    outputAnAdvertQueue);
             thread = new Thread(olxThread);
             thread.setDaemon(true);
             thread.setName("OlxAnAdvertParserThread " + i);

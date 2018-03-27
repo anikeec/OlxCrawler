@@ -42,7 +42,7 @@ public class OlxSearchPageParserThread implements Runnable {
             try {
                 ExpandedLink searchPageLink = inputLinkQueue.take();
                 log.debug(classname, Thread.currentThread().getName() + " take link.");
-                
+                log.info(classname, "inputLinkQueue - amount of data: " + inputLinkQueue.size());
                 String content = 
                         new GetRequest().makeRequest(searchPageLink.getLink(), GetRequest.OLX_HOST).getContent();
                 

@@ -38,13 +38,11 @@ public class AnAdvertKeeperThread extends Thread {
         while(!Thread.currentThread().isInterrupted()) {
             try {
                 advert = inputAnAdvertQueue.take();
-                if(querySize != inputAnAdvertQueue.size()) {
-                    querySize = inputAnAdvertQueue.size();
-                    log.info(classname, "AnAdvertKeeperQueue - amount of data: " + querySize);
-                }
+                log.info(classname, "Input anAdvertParserOutputQueue: " + inputAnAdvertQueue.size());
                 phoneQuery = keeper.keepAnAdvert(advert);
                 if(phoneQuery != null) {
                     try {
+                        log.info(classname, "Output phoneQueryQueue: " + outputQueryQueue.size());
                         outputQueryQueue.put(phoneQuery);
                     } catch (InterruptedException ex) {
                         log.error(classname, ExceptionUtils.getStackTrace(ex));

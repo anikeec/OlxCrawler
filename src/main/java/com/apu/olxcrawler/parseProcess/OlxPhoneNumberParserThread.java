@@ -48,10 +48,7 @@ public class OlxPhoneNumberParserThread implements Runnable {
             int querySize = 0;
             try {
                 query = inputQueryQueue.take();
-                if(querySize != inputQueryQueue.size()) {
-                    querySize = inputQueryQueue.size();
-                    log.info(classname, "PhoneQueryQueue - amount of data: " + querySize);
-                }
+                log.info(classname, "Input PhoneQueryQueue: " + inputQueryQueue.size());
                 if((query == null) || (query.getAnAdvert() == null)) 
                     continue;
                 int counter = 0;
@@ -65,6 +62,7 @@ public class OlxPhoneNumberParserThread implements Runnable {
                 anAdvert.setAuthor(query.getAnAdvert().getAuthor());
                 anAdvert.setPhone(phoneNumber);
                 log.debug(classname, Thread.currentThread().getName() + " put phone.");
+                log.info(classname, "Output anAdvertParserOutputQueue put phone: " + outputAnAdvertQueue.size());
                 outputAnAdvertQueue.put(anAdvert); 
                 Thread.sleep(PHONE_NUMBER_QUERY_TIMEOUT);
             } catch (InterruptedException ex) {
