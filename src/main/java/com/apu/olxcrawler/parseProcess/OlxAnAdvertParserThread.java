@@ -41,9 +41,14 @@ public class OlxAnAdvertParserThread implements Runnable {
     public void run() {
         OlxAnAdvertParser parser;
         parser = new OlxAnAdvertParser(outputQueryQueue);
+        int querySize = 0;
         while(Thread.currentThread().isInterrupted() == false) {
             try {
                 ExpandedLink link = inputLinkQueue.take();
+                if(querySize != inputLinkQueue.size()) {
+                    querySize = inputLinkQueue.size();
+                    log.info(classname, "AnAdvertQueue - amount of data: " + querySize);
+                }
                 log.debug(classname, Thread.currentThread().getName() + " take link.");
                 AnAdvert advert = parser.getAnAdvertFromLink(link);
                 if(advert.getId() != null) {

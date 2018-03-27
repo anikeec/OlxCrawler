@@ -64,7 +64,7 @@ public class OlxAnAdvertParser {
         advert.setPrice(getPriceFromContent(content));
         advert.setPublicationDate(getPublicationDateFromContent(content));
         advert.setRegion(getRegionFromContent(content));
-        advert.setPhone(null);
+        advert.setPhone(getPhoneAvailabilityFromContent(content));
         advert.setUserId(getUserIdFromLink(link.getLink()));
         advert.setUserOffers(getUserOffersFromContent(content));
         advert.setUserSince(getUserSinceFromContent(content));
@@ -180,6 +180,14 @@ public class OlxAnAdvertParser {
         return ret;
     }
     
+    private String getPhoneAvailabilityFromContent(String content) {
+        if(content == null) return null;
+        String innerContent = getPhoneLabelBlockFromContent(content);
+        if(innerContent != null)
+            return "";
+        return null;
+    }
+    
     private String getPublicationDateFromContent(String content) {
         if(content == null) return null;
         String innerContent = getOfferTitleboxDetailsBlockFromContent(content);
@@ -249,6 +257,23 @@ public class OlxAnAdvertParser {
         String startPattern = "<div class=\"price-label\">";
         String endPattern = "</div>";
         return getPatternCutOut(content, startPattern, endPattern);
+    }
+    
+    private String getPhoneLabelBlockFromContent(String content) {
+        if(content == null) return null;
+        String startPattern = "<div class=\"contact-button link-phone";
+        String endPattern = "</div>";
+        String block = getPatternCutOut(content, startPattern, endPattern);
+        return getPhoneLabelFromBlock(block);
+    }
+    
+    private String getPhoneLabelFromBlock(String content) {
+        if(content == null) return null;
+        String startPattern = "data-rel=\"phone\">";
+        int startPosition = content.indexOf(startPattern) ;
+        if(startPosition == -1)
+                            return null;
+        return content.substring(startPosition + startPattern.length());
     }
     
     private String getOfferDescriptionContentBlockFromContent(String content) {
