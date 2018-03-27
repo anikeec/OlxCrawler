@@ -200,111 +200,111 @@ public class AnAdvertKeeper {
                 
                 
             
-            //c1 - get PHONE&NAME from AnAdvert
-            String nameStr = advert.getAuthor();
-            String phoneStr = advert.getPhone();
-            
-            //c2 - chech if this combination exists in DB
-            PhoneName phoneName = pNameRepository.get(nameStr, phoneStr);
-            if(phoneName == null) {
-                //c3  - if it doesn't exist -> a1, b1, create PHONENAME, fill date and persist its to DB, load phonenameId
-                //a1 - get NAME from AnAdvert
-                //a2 - chech if it exists in DB
-                UserName uName = uNameRepository.get(nameStr);
-                Integer uNameId;
-                if(uName == null) {
-                    //a3  - if it doesn't exist -> create and persist its to DB, load usernameId
-                    uName = new UserName();
-                    uName.setName(nameStr);
-                    uNameId = uNameRepository.save(uName);
+                //c1 - get PHONE&NAME from AnAdvert
+                String nameStr = advert.getAuthor();
+                String phoneStr = advert.getPhone();
+
+                //c2 - chech if this combination exists in DB
+                PhoneName phoneName = pNameRepository.get(nameStr, phoneStr);
+                if(phoneName == null) {
+                    //c3  - if it doesn't exist -> a1, b1, create PHONENAME, fill date and persist its to DB, load phonenameId
+                    //a1 - get NAME from AnAdvert
+                    //a2 - chech if it exists in DB
+                    UserName uName = uNameRepository.get(nameStr);
+                    Integer uNameId;
+                    if(uName == null) {
+                        //a3  - if it doesn't exist -> create and persist its to DB, load usernameId
+                        uName = new UserName();
+                        uName.setName(nameStr);
+                        uNameId = uNameRepository.save(uName);
+                    }
+
+                    //b1 - get PHONE from AnAdvert
+                    //b2 - chech if it exists in DB
+                    PhoneNumber pNumber = pNumberRepository.get(phoneStr);
+                    Integer pNumberId;
+                    if(pNumber == null) {
+                        //b3  - if it doesn't exist -> create and persist its to DB, load phoneId
+                        pNumber = new PhoneNumber();
+                        pNumber.setNumber(phoneStr);
+                        pNumberId = pNumberRepository.save(pNumber);
+                    }
+
+                    phoneName = new PhoneName();
+                    phoneName.setUserName(uName);
+                    phoneName.setPhoneNumber(pNumber);
+                    phoneName.setDate(new Date());
+                    Integer phoneNameId = pNameRepository.save(phoneName);
                 }
-                
-                //b1 - get PHONE from AnAdvert
-                //b2 - chech if it exists in DB
-                PhoneNumber pNumber = pNumberRepository.get(phoneStr);
-                Integer pNumberId;
-                if(pNumber == null) {
-                    //b3  - if it doesn't exist -> create and persist its to DB, load phoneId
-                    pNumber = new PhoneNumber();
-                    pNumber.setNumber(phoneStr);
-                    pNumberId = pNumberRepository.save(pNumber);
+
+                String userId = advert.getUserId();
+                //d1 - get user ID from AnAdvert
+                //d2 - chech if he exist in DB
+                User usr = userRepository.get(userId);
+                if(usr == null) {
+                    //d3  - if he doesn't exist -> create and persist him to DB, load userId
+                    usr = new User();
+                    usr.setId(userId);
+                    Integer usrId = userRepository.save(usr);
                 }
-                
-                phoneName = new PhoneName();
-                phoneName.setUserName(uName);
-                phoneName.setPhoneNumber(pNumber);
-                phoneName.setDate(new Date());
-                Integer phoneNameId = pNameRepository.save(phoneName);
-            }
-            
-            String userId = advert.getUserId();
-            //d1 - get user ID from AnAdvert
-            //d2 - chech if he exist in DB
-            User usr = userRepository.get(userId);
-            if(usr == null) {
-                //d3  - if he doesn't exist -> create and persist him to DB, load userId
-                usr = new User();
-                usr.setId(userId);
-                Integer usrId = userRepository.save(usr);
-            }
-            
-            //e1 - check if phonenameId (c3) exists in user's phonenameCollection
-            if(usr.getPhoneNameCollection().contains(phoneName) == false) {
-                //e2  - if it doesn't exist -> add its to user's phonenameCollection
-                usr.getPhoneNameCollection().add(phoneName);
-            }
-            
-            //f1 - get phonenameId from c1
-            //f2 - get userId from d1
-            //f3 - get other info from AnAdvert
-            //f4 - get advert ID from AnAdvert
-            String advertIdStr = advert.getId();
-            //f5 - check if advert with this ID exists in DB
-            Advert adv = null;
-            BigInteger advertId = null;
-            try {
-                if(advertIdStr != null) {
-                    advertId = new BigInteger(advertIdStr);
-                    adv = advertRepository.get(advertId);
+
+                //e1 - check if phonenameId (c3) exists in user's phonenameCollection
+                if(usr.getPhoneNameCollection().contains(phoneName) == false) {
+                    //e2  - if it doesn't exist -> add its to user's phonenameCollection
+                    usr.getPhoneNameCollection().add(phoneName);
                 }
-            } catch(NumberFormatException ex) {
-                log.error(classname, "Error BigInteger from advertIdStr: " + advertIdStr);
-            }
-            if(adv == null) {
-                //f6  - if it doesn't exist -> create and persist it to DB
-                adv = new Advert();
-                adv.setId(advertId);
-                adv.setUser(usr);
-                Long advId = advertRepository.save(adv);
-                adv.getPhoneNameCollection().add(phoneName);
-                adv.setDescription(advert.getDescription());
-                adv.setHeader(advert.getHeader());
-                adv.setLink(advert.getLink());
-                adv.setPrice(advert.getPrice());
-                adv.setPublicationDate(Time.timeStrToDate(advert.getPublicationDate()));
-                adv.setPublicationTime(Time.timeStrToTime(advert.getPublicationDate()));
-                adv.setRegion(advert.getRegion());
-                adv.setUserSince(Time.timeStrToDate(advert.getUserSince()));
-            } else {
-                /* f7  - if it exists -> check other info and change it if there is a need,
-                check does phonenameId equal to last phonenameId from advert's phonenameCollection
-                if it is not equal then add phonenameId to advert's phonenameCollection
-                */
-                adv.setId(advertId);
-                adv.setUser(usr);
-                if(adv.getPhoneNameCollection().contains(phoneName) == false)
+
+                //f1 - get phonenameId from c1
+                //f2 - get userId from d1
+                //f3 - get other info from AnAdvert
+                //f4 - get advert ID from AnAdvert
+                String advertIdStr = advert.getId();
+                //f5 - check if advert with this ID exists in DB
+                Advert adv = null;
+                BigInteger advertId = null;
+                try {
+                    if(advertIdStr != null) {
+                        advertId = new BigInteger(advertIdStr);
+                        adv = advertRepository.get(advertId);
+                    }
+                } catch(NumberFormatException ex) {
+                    log.error(classname, "Error BigInteger from advertIdStr: " + advertIdStr);
+                }
+                if(adv == null) {
+                    //f6  - if it doesn't exist -> create and persist it to DB
+                    adv = new Advert();
+                    adv.setId(advertId);
+                    adv.setUser(usr);
+                    Long advId = advertRepository.save(adv);
                     adv.getPhoneNameCollection().add(phoneName);
-                adv.setDescription(advert.getDescription());
-                adv.setHeader(advert.getHeader());
-                adv.setLink(advert.getLink());
-                adv.setPrice(advert.getPrice());
-                adv.setPublicationDate(Time.timeStrToDate(advert.getPublicationDate()));
-                adv.setPublicationTime(Time.timeStrToTime(advert.getPublicationDate()));
-                adv.setRegion(advert.getRegion());
-                adv.setUserSince(Time.timeStrToDate(advert.getUserSince()));
-            }
-            
-            returnQuery = new PhoneNumberQuery(advert, advert.getPreviousQueryResult());
+                    adv.setDescription(advert.getDescription());
+                    adv.setHeader(advert.getHeader());
+                    adv.setLink(advert.getLink());
+                    adv.setPrice(advert.getPrice());
+                    adv.setPublicationDate(Time.timeStrToDate(advert.getPublicationDate()));
+                    adv.setPublicationTime(Time.timeStrToTime(advert.getPublicationDate()));
+                    adv.setRegion(advert.getRegion());
+                    adv.setUserSince(Time.timeStrToDate(advert.getUserSince()));
+                } else {
+                    /* f7  - if it exists -> check other info and change it if there is a need,
+                    check does phonenameId equal to last phonenameId from advert's phonenameCollection
+                    if it is not equal then add phonenameId to advert's phonenameCollection
+                    */
+                    adv.setId(advertId);
+                    adv.setUser(usr);
+                    if(adv.getPhoneNameCollection().contains(phoneName) == false)
+                        adv.getPhoneNameCollection().add(phoneName);
+                    adv.setDescription(advert.getDescription());
+                    adv.setHeader(advert.getHeader());
+                    adv.setLink(advert.getLink());
+                    adv.setPrice(advert.getPrice());
+                    adv.setPublicationDate(Time.timeStrToDate(advert.getPublicationDate()));
+                    adv.setPublicationTime(Time.timeStrToTime(advert.getPublicationDate()));
+                    adv.setRegion(advert.getRegion());
+                    adv.setUserSince(Time.timeStrToDate(advert.getUserSince()));
+                }
+
+                returnQuery = new PhoneNumberQuery(advert, advert.getPreviousQueryResult());
             
             }
             session.flush();
