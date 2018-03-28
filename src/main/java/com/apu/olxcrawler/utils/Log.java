@@ -22,7 +22,7 @@ public class Log {
     static Logger logger = Logger.getLogger(Logger.class);
     private static Log instance;
     
-    private static final int LOGGING_QUEUE_SIZE = 500;
+    private static final int LOGGING_QUEUE_SIZE = 1000;
     private BlockingQueue<LogItem> logQueue;
     
     private Log() {
