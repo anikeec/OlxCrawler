@@ -78,7 +78,15 @@ public class OlxAnAdvertParser {
         return advert;
     }
     
-    
+    public static String cleanLinkForCompare(String link) {
+        if(link == null)    
+                return null;
+        String endPattern = ".html";
+        int endPosition = link.indexOf(endPattern);
+        if(endPosition == -1)
+                return null;
+        return link.substring(0, endPosition + endPattern.length());
+    }
     
     public static String getUserIdFromLink(String link) {
         if(link == null)    return null;
