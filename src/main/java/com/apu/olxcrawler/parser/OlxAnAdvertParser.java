@@ -56,7 +56,12 @@ public class OlxAnAdvertParser {
         advert.setAuthor(getAuthorFromContent(content));
         advert.setDescription(getDescriptionFromContent(content));
         advert.setHeader(getHeaderFromContent(content));
-        advert.setId(getIdFromContent(content));
+        try {
+            advert.setId(getIdFromContent(content));
+        } catch(IllegalInputValueException ex) {
+            result.setInvalid();
+            throw new IllegalInputValueException(ex.toString());
+        }
         advert.setLink(link.getLink());        
         advert.setPrice(getPriceFromContent(content));
         advert.setPublicationDate(getPublicationDateFromContent(content));

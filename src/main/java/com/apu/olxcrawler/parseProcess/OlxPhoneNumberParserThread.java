@@ -29,8 +29,8 @@ public class OlxPhoneNumberParserThread implements Runnable {
     
     private final BlockingQueue<PhoneNumberQuery> inputQueryQueue;
     private final BlockingQueue<AnAdvert> outputAnAdvertQueue;
-    private final int QUERY_TRY_COUNTER_MAX = 10;
-    private final long PHONE_NUMBER_QUERY_TIMEOUT = 100;
+    private final int QUERY_TRY_COUNTER_MAX = 5;
+    private final long PHONE_NUMBER_QUERY_TIMEOUT = 2000;
 
     public OlxPhoneNumberParserThread(
                         BlockingQueue<PhoneNumberQuery> inputQueryQueue, 
@@ -53,6 +53,7 @@ public class OlxPhoneNumberParserThread implements Runnable {
                     continue;
                 int counter = 0;
                 do{
+                    log.info(classname, "Rerty query counter: " + counter);
                     phoneNumber = getPhoneFromUrlAndResult(query.getAnAdvert().getLink(),
                                                 query.getPreviousQueryResult());
                     counter++;
@@ -103,6 +104,7 @@ public class OlxPhoneNumberParserThread implements Runnable {
                 ret = ret.replaceAll("[()\\-\\+]", "");
                 if(ret.contains("000000")) {
                     log.info(classname, "Phone number request error: " + ret);
+                    phoneRequestResult.setInvalid();
                     return null;
                 }
                 String regExpUrl = "(38)\\d{10}";
@@ -111,6 +113,7 @@ public class OlxPhoneNumberParserThread implements Runnable {
                 if(matcher.matches() == true) {
                     ret = ret.replaceFirst("(38)", "");
                 }
+                phoneRequestResult.setValid();
             } 
             
             if((ret != null) && (ret.length() > 15)) {

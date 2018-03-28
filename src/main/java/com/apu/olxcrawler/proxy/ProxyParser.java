@@ -44,7 +44,7 @@ public class ProxyParser {
                         ptr++;
                         continue;
                     }
-                    proxyItem = new ProxyItem();
+                    proxyItem = new ProxyItem("",0);
                     List<HtmlTableCell> cells = row.getCells();
                     
                     proxyItem.setIp(cells.get(0).asText());

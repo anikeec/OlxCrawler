@@ -163,7 +163,7 @@ public class GetRequest {
             CookieItemList cookieList = 
                         cookiesToCookieItemList(cookiesRet);
             
-            return new QueryResult(responseBody, cookieList);
+            return new QueryResult(responseBody, cookieList, proxy);
         } catch (IOException ex) {            
             if(proxy != null) {
                 proxy.setInvalid();

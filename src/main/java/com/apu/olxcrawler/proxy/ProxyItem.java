@@ -5,11 +5,18 @@
  */
 package com.apu.olxcrawler.proxy;
 
+import com.apu.olxcrawler.utils.Log;
+import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Date;
+
 /**
  *
  * @author apu
  */
 public class ProxyItem {
+    
+    private static final Log log = Log.getInstance();
+    private final Class classname = ProxyItem.class;
     
     /** Proxy server IP address */
     private String ip;
@@ -24,18 +31,18 @@ public class ProxyItem {
     private Integer delay;
     
     /** Amount of clients who can use this proxy concurrently */
-    private final int USED_SEMAPHORE_INIT = 1;
+    private final int USED_SEMAPHORE_INIT = 5;
     private volatile int usedSemaphore = USED_SEMAPHORE_INIT;
     
     /** Amount of tries this proxy usage */
-    private final int VALID_SEMAPHORE_INIT = 1;    
+    private final int VALID_SEMAPHORE_INIT = 5;    
     private volatile int validSemaphore = VALID_SEMAPHORE_INIT;
-
-    public ProxyItem() {
-        this(null, null);
-    }  
+    
+    private Date timeBecameInvalid; 
 
     public ProxyItem(String ip, Integer port) {
+        checkNotNull(ip);
+        checkNotNull(port);
         this.ip = ip;
         this.port = port;
     }
@@ -45,6 +52,7 @@ public class ProxyItem {
     }
 
     public void setIp(String ip) {
+        checkNotNull(ip);
         this.ip = ip;
     }
 
@@ -53,6 +61,7 @@ public class ProxyItem {
     }
 
     public void setPort(Integer port) {
+        checkNotNull(port);
         this.port = port;
     }
 
@@ -65,11 +74,13 @@ public class ProxyItem {
     public synchronized void setValid() {
         if(validSemaphore < VALID_SEMAPHORE_INIT)
             validSemaphore++;
+        log.info(classname, "Proxy " + this + " is valid. N = " + validSemaphore);
     }
     
-    public synchronized void setInvalid() {
+    public synchronized void setInvalid() {        
         if(validSemaphore > 0)
             validSemaphore--;
+        log.info(classname, "Proxy " + this + " is invalid. N = " + validSemaphore);
     }
 
     public synchronized boolean isUnused() {
@@ -85,6 +96,14 @@ public class ProxyItem {
     public synchronized void clearUsed() {
         if(usedSemaphore < USED_SEMAPHORE_INIT)
             usedSemaphore++;
+    }
+
+    public synchronized Date getTimeBecameInvalid() {
+        return timeBecameInvalid;
+    }
+
+    public synchronized void setTimeBecameInvalid(Date timeBecameInvalid) {
+        this.timeBecameInvalid = timeBecameInvalid;
     }
 
     public String getCountry() {
