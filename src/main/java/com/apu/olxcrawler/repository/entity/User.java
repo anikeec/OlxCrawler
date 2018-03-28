@@ -59,8 +59,8 @@ public class User implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date registrationDate;
     
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Collection<Advert> advertCollection;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Collection<Advert> advertCollection = new ArrayList<>();
     
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
