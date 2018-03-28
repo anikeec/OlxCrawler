@@ -6,7 +6,10 @@
 package com.apu.olxcrawler.mainlogic;
 
 import com.apu.olxcrawler.entity.AnAdvert;
+import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.parseProcess.PhoneNumberQuery;
+import com.apu.olxcrawler.parser.IllegalInputValueException;
+import com.apu.olxcrawler.parser.OlxAnAdvertParser;
 import com.apu.olxcrawler.repository.AdvertRepository;
 import com.apu.olxcrawler.repository.ORM.AdvertRepositoryHB;
 import com.apu.olxcrawler.repository.ORM.HibernateUtil;
@@ -26,7 +29,10 @@ import com.apu.olxcrawler.repository.entity.UserName;
 import com.apu.olxcrawler.utils.Log;
 import com.apu.olxcrawler.utils.Time;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -82,7 +88,71 @@ public class AnAdvertKeeper {
         Process:   
         c1 -> d1 -> e1 -> f1
         
-    */   
+    */  
+    
+    public boolean isLinkExistInDB(ExpandedLink link) {
+        if(link == null) {
+            log.error(classname, "Error in method isLinkExistInDB() - Input link is NULL.");
+            return false;
+        }
+        PhoneNumberQuery returnQuery = null;
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = null;
+        try {
+//            session = sessionFactory.getCurrentSession();
+            session = sessionFactory.openSession();
+            uNameRepository = new UserNameRepositoryHB(session);
+            pNumberRepository = new PhoneNumberRepositoryHB(session);
+            pNameRepository = new PhoneNameRepositoryHB(session);
+            advertRepository = new AdvertRepositoryHB(session);
+            userRepository = new UserRepositoryHB(session);
+            
+            session.beginTransaction();
+            
+            String userId = OlxAnAdvertParser.getUserIdFromLink(link.getLink());
+            if(userId == null)
+                return false;
+            
+            User user = getUserById(userId);
+            if(user == null)
+                return false;
+            
+            Collection<Advert> advertCollection = user.getAdvertCollection();
+            
+            for(Advert advert:advertCollection) {
+                if(advert.getLink() == null)
+                    continue;
+                String advertLink = 
+                        OlxAnAdvertParser.cleanLinkForCompare(advert.getLink());
+                String inputLink = 
+                        OlxAnAdvertParser.cleanLinkForCompare(link.getLink());
+                if(advertLink.equals(inputLink)) {
+                    log.info(classname, "Links compare is TRUE.");
+                    //check is advert has phone
+                    for(PhoneName phoneName:advert.getPhoneNameCollection()) {
+                        String phoneNumber = 
+                                phoneName.getPhoneNumber().getNumber();
+                        if(phoneNumber != null)
+                            return true;
+                    }
+                    log.info(classname, "Looking for not NULL phone is FALSE.");
+                    return false;
+                }
+                log.info(classname, "Links compare is FALSE." + 
+                        "Advert link is: " + advert.getLink() + 
+                        " ,\r\n" +
+                        "Input link is:  " + link.getLink());
+            }
+            
+            session.flush();
+            session.getTransaction().commit();
+        } finally {
+//            if ((session!=null) && (!session.isConnected()))
+            if(session != null)
+                    session.close();
+        }
+        return false;
+    }
     
 
     public PhoneNumberQuery keepAnAdvert(AnAdvert advert) {
@@ -115,8 +185,26 @@ public class AnAdvertKeeper {
                     check does phonenameId equal to last phonenameId from advert's phonenameCollection
                     if it is not equal then add phonenameId to advert's phonenameCollection
                     */
-                    if(adv.getPhoneNameCollection().contains(phoneName) == false)
+                    if(adv.getPhoneNameCollection().contains(phoneName) == false) {
+                        List<PhoneName> removeList = new ArrayList<>();
+                        for(PhoneName pn: adv.getPhoneNameCollection()) {
+                            if(pn.getPhoneNumber().getNumber() == null) {                               
+                                
+                                if((pn.getUserName().getName() == null) && 
+                                        (advert.getAuthor() == null)) {
+                                    removeList.add(pn);
+                                } else if((advert.getAuthor() != null) &&
+                                        (pn.getUserName().getName() != null) &&
+                                        (pn.getUserName().getName().equals(advert.getAuthor())))
+                                    removeList.add(pn);
+                                
+                            }
+                        }
+                        if(removeList.size() > 0) {
+                            adv.getPhoneNameCollection().removeAll(removeList);
+                        }
                         adv.getPhoneNameCollection().add(phoneName);
+                    }
                 }               
                 
             } else {
