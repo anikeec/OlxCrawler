@@ -6,6 +6,7 @@
 package com.apu.olxcrawler.repository.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -46,7 +47,7 @@ public class PhoneNumber implements Serializable {
     private String number; 
     
     @OneToMany(mappedBy = "phoneNumber", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Collection<PhoneName> phoneNameCollection;
+    private Collection<PhoneName> phoneNameCollection = new ArrayList<>();
 
     public PhoneNumber() {
     }

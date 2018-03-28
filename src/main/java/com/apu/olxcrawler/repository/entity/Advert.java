@@ -86,7 +86,7 @@ public class Advert implements Serializable {
     )  
     private Collection<PhoneName> phoneNameCollection = new ArrayList<>();
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 

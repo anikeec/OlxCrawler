@@ -6,6 +6,7 @@
 package com.apu.olxcrawler.repository.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -15,10 +16,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -50,7 +47,7 @@ public class UserName implements Serializable {
     private String name;
     
     @OneToMany(mappedBy = "userName", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Collection<PhoneName> phoneNameCollection;
+    private Collection<PhoneName> phoneNameCollection = new ArrayList<>();
 
     public UserName() {
     }
