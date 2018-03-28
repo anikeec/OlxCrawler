@@ -24,6 +24,7 @@ public class OlxSearchLListToAdAdvertLThread implements Runnable {
 
     private final BlockingQueue<SearchPageQuery> inputSearchPageQueue;
     private final BlockingQueue<ExpandedLink> outputLinkQueue;
+    private final long SEARCH_LIST_QUERY_TIMEOUT = 5000; 
 
     public OlxSearchLListToAdAdvertLThread(
                             BlockingQueue<SearchPageQuery> inputSearchPageQueue, 
@@ -44,6 +45,7 @@ public class OlxSearchLListToAdAdvertLThread implements Runnable {
                 for(String link:linkList) {
                     outputLinkQueue.put(new ExpandedLink(link, spQuery.getInitQuery()));
                 }
+                Thread.sleep(SEARCH_LIST_QUERY_TIMEOUT);
             } catch (InterruptedException ex) {
                 log.error(classname, ExceptionUtils.getStackTrace(ex));
             }
