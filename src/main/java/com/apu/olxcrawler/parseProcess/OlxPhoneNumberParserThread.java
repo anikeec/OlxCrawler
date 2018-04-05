@@ -29,8 +29,9 @@ public class OlxPhoneNumberParserThread implements Runnable {
     
     private final BlockingQueue<PhoneNumberQuery> inputQueryQueue;
     private final BlockingQueue<AnAdvert> outputAnAdvertQueue;
-    private final int QUERY_TRY_COUNTER_MAX = 5;
+    private final int QUERY_TRY_COUNTER_MAX = 3;
     private final long PHONE_NUMBER_QUERY_TIMEOUT = 2000;
+    private final long PHONE_NUMBER_RETRANS_TIMEOUT = 300;
 
     public OlxPhoneNumberParserThread(
                         BlockingQueue<PhoneNumberQuery> inputQueryQueue, 
@@ -57,6 +58,8 @@ public class OlxPhoneNumberParserThread implements Runnable {
                     phoneNumber = getPhoneFromUrlAndResult(query.getAnAdvert().getLink(),
                                                 query.getPreviousQueryResult());
                     counter++;
+                    if(phoneNumber == null)
+                        Thread.sleep(PHONE_NUMBER_RETRANS_TIMEOUT);
                 } while((phoneNumber == null)&&(counter<QUERY_TRY_COUNTER_MAX));
                 anAdvert = new AnAdvert();
                 anAdvert.setId(query.getAnAdvert().getId());
