@@ -22,6 +22,8 @@ import static org.junit.Assert.*;
 public class ProxyManagerTest {
     
     private ProxyManager proxyManager;
+    private final int USERS_AMOUNT_ON_PROXY = 5;
+    private final int INVALID_AMOUNT = 5;
     
     public ProxyManagerTest() {
     }
@@ -66,12 +68,15 @@ public class ProxyManagerTest {
     @Test
     public void testTake() throws GetRequestException {
         System.out.println("take");
+        for(int i=0; i<(USERS_AMOUNT_ON_PROXY-1); i++)
+            this.proxyManager.take();
         ProxyItem item1 = this.proxyManager.take();
         assertNotNull(item1);
         assertFalse(item1.isUnused());
         ProxyItem item2 = this.proxyManager.take();
         assertNull(item2);
-        item1.setInvalid();
+        for(int i=0; i<INVALID_AMOUNT; i++)
+            item1.setInvalid();        
         this.proxyManager.put(item1);
         ProxyItem item3 = this.proxyManager.take();
         assertNull(item3);
@@ -111,6 +116,8 @@ public class ProxyManagerTest {
     @Test
     public void testPut() {
         System.out.println("put");
+        for(int i=0; i<(USERS_AMOUNT_ON_PROXY-1); i++)
+            this.proxyManager.take();
         ProxyItem item = this.proxyManager.take();
         assertFalse(item.isUnused());
         this.proxyManager.put(item);
@@ -128,7 +135,7 @@ public class ProxyManagerTest {
         this.proxyManager.add(item);
         int value2 = this.proxyManager.getProxyListSize();
         assertTrue(value2 == (value1 + 1));
-        item = new ProxyItem(null, null);
+        item = new ProxyItem("", 0);
         this.proxyManager.add(item);
         int value3 = this.proxyManager.getProxyListSize();
         assertTrue(value3 == value2);
