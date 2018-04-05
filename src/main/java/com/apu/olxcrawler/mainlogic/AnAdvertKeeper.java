@@ -88,8 +88,7 @@ public class AnAdvertKeeper {
         Process:   
         c1 -> d1 -> e1 -> f1
         
-    */  
-    
+    */     
     public boolean isLinkExistInDB(ExpandedLink link) {
         if(link == null) {
             log.error(classname, "Error in method isLinkExistInDB() - Input link is NULL.");
@@ -101,11 +100,8 @@ public class AnAdvertKeeper {
         try {
 //            session = sessionFactory.getCurrentSession();
             session = sessionFactory.openSession();
-            uNameRepository = new UserNameRepositoryHB(session);
-            pNumberRepository = new PhoneNumberRepositoryHB(session);
-            pNameRepository = new PhoneNameRepositoryHB(session);
-            advertRepository = new AdvertRepositoryHB(session);
-            userRepository = new UserRepositoryHB(session);
+            
+            repositoriesInit(session);
             
             session.beginTransaction();
             
@@ -150,6 +146,7 @@ public class AnAdvertKeeper {
 //            if ((session!=null) && (!session.isConnected()))
             if(session != null)
                     session.close();
+            repositoriesClose();
         }
         return false;
     }
@@ -162,11 +159,8 @@ public class AnAdvertKeeper {
         try {
 //            session = sessionFactory.getCurrentSession();
             session = sessionFactory.openSession();
-            uNameRepository = new UserNameRepositoryHB(session);
-            pNumberRepository = new PhoneNumberRepositoryHB(session);
-            pNameRepository = new PhoneNameRepositoryHB(session);
-            advertRepository = new AdvertRepositoryHB(session);
-            userRepository = new UserRepositoryHB(session);
+            
+            repositoriesInit(session);
             
             session.beginTransaction();
             
@@ -259,6 +253,7 @@ public class AnAdvertKeeper {
 //            if ((session!=null) && (!session.isConnected()))
             if(session != null)
                     session.close();
+            repositoriesClose();
         }
         return returnQuery;
     }
@@ -375,6 +370,22 @@ public class AnAdvertKeeper {
         }
         
         return usr;
+    }
+    
+    private void repositoriesInit(Session session) {
+        this.uNameRepository = new UserNameRepositoryHB(session);
+        this.pNumberRepository = new PhoneNumberRepositoryHB(session);
+        this.pNameRepository = new PhoneNameRepositoryHB(session);
+        this.advertRepository = new AdvertRepositoryHB(session);
+        this.userRepository = new UserRepositoryHB(session);
+    }
+    
+    private void repositoriesClose() {
+        this.uNameRepository = null;
+        this.pNumberRepository = null;
+        this.pNameRepository = null;
+        this.advertRepository = null;
+        this.userRepository = null;
     }
     
     public static void main(String[] args) {
