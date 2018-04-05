@@ -21,7 +21,7 @@ public class ProxyGetThread extends Thread {
     
     private final long PROXY_POLLING_TIMEOUT = 10*60*1000;
     private List<String> proxyUrlList = new ArrayList<>();
-    private boolean queryActive = false;
+    private volatile boolean queryActive = false;
 
     public void init() {
         proxyUrlList.add("https://hidemy.name/ru/proxy-list/?maxtime=1000&ports=3128&type=h#list");

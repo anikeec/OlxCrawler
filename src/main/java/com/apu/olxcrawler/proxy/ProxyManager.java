@@ -25,7 +25,7 @@ public class ProxyManager {
     private volatile int proxyPtr = 0;
     
     /** ProxyManager instance */
-    private static ProxyManager instance;
+    private static volatile ProxyManager instance;
 
     public ProxyManager() {
         this.proxyList = new ArrayList<>();        
@@ -64,7 +64,7 @@ public class ProxyManager {
      * Get ProxyManager's instance
      * @return ProxyManager instance
      */
-    public static ProxyManager getInstance() {
+    public synchronized static ProxyManager getInstance() {
         return instance;
     }
 
@@ -72,7 +72,7 @@ public class ProxyManager {
      * Set ProxyManager's instance
      * @param instance
      */
-    public static void setInstance(ProxyManager instance) {
+    public synchronized static void setInstance(ProxyManager instance) {
         ProxyManager.instance = instance;
     }   
     
