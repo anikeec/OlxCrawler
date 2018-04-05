@@ -20,7 +20,7 @@ public class ProxyGetThread extends Thread {
     private final Class classname = ProxyGetThread.class;
     
     private final long PROXY_POLLING_TIMEOUT = 10*60*1000;
-    private List<String> proxyUrlList = new ArrayList<>();
+    private final List<String> proxyUrlList = new ArrayList<>();
     private volatile boolean queryActive = false;
 
     public void init() {
