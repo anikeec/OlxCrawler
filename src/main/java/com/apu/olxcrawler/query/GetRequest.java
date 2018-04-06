@@ -42,6 +42,13 @@ public class GetRequest {
     private final ConnectionManager connectionManager = 
                             ConnectionManager.getInstance();
     
+    /**
+     * Make GET request 
+     * 
+     * @param parameters
+     * @return OlxResult - query response
+     * @throws GetRequestException
+     */
     public QueryResult makeRequest(QueryParams parameters) throws GetRequestException {
         String urlStr = null;
         String host = null;
@@ -151,6 +158,16 @@ public class GetRequest {
         }
     }
     
+    /**
+     * Make GET request with additional parameters.
+     * It repeats queries until good response has come, 
+     * but no more than ERRORS_MAX times.
+     * As we have ability to use proxies it repeats queries through few proxies
+     * 
+     * @param parameters
+     * @return QueryResult - query response
+     * @throws GetRequestException
+     */
     public QueryResult makeRequestWithRetrans(QueryParams parameters) 
                 throws GetRequestException {
         final int ERRORS_MAX = 5;
@@ -168,147 +185,6 @@ public class GetRequest {
                     throw new GetRequestException("Server or proxy unavailable", ex);
                 }
             }
-        }
-    }
-    
-    /**
-     * Make GET request 
-     * 
-     * @param urlStr - link for GET query
-     * @param host
-     * @return OlxResult - query response
-     * @throws GetRequestException
-     */
-//    public QueryResult makeRequest(String urlStr, String host) throws GetRequestException {        
-//        return makeRequest(urlStr, host, null, null);
-//    }
-    
-    /**
-     * Make GET request with additional parameters.
-     * It repeats queries until good response has come, 
-     * but no more than ERRORS_MAX times.
-     * As we have ability to use proxies it repeats queries through few proxies
-     * 
-     * @param urlStr - link for GET query
-     * @param host
-     * @param refererUrlStr
-     * @param previousResult - used for next request with previous request results
-     * @return QueryResult - query response
-     * @throws GetRequestException
-     */
-    public QueryResult makeRequest(String urlStr, String host, 
-                            String refererUrlStr, QueryResult previousResult) 
-                throws GetRequestException {
-        final int ERRORS_MAX = 5;
-        int errorCounter = 0;
-        QueryResult response;
-        while(true) {
-            try {
-                response = handleRequest(urlStr, host, refererUrlStr, previousResult);
-                if(response.getContent() != null)
-                    return response;
-            } catch(GetRequestException ex) {
-                errorCounter++;
-                log.error(classname, "Request error #" + errorCounter);
-                if(errorCounter >= ERRORS_MAX) {
-                    throw new GetRequestException("Server or proxy unavailable", ex);
-                }
-            }
-        }
-    }
-    
-    /**
-     * Make GET request with additional parameters
-     * 
-     * @param urlStr - link for GET query
-     * @param refererUrlStr
-     * @param previousResult - used for next request with previous request results
-     * @return QueryResult - query response
-     * @throws GetRequestException
-     */
-    private QueryResult handleRequest(String urlStr, String host, 
-                            String refererUrlStr, QueryResult previousResult) 
-                throws GetRequestException {
-        HttpClientItem httpClientItem = connectionManager.getClient();
-        HttpClient client = httpClientItem.getHttpClient();
-        client.getParams().setConnectionManagerTimeout(5000);
-//        client.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
-        
-        if((previousResult != null) && (refererUrlStr != null))
-            client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
-        GetMethod request = new GetMethod(urlStr);  
-
-        ProxyManager proxyManager = ProxyManager.getInstance();
-        ProxyItem proxy = null;        
-        if((previousResult != null) && (refererUrlStr != null)) {        
-            proxy = proxyManager.take();
-            if(proxy != null) {
-                HttpHost proxyHost = new HttpHost(proxy.getIp());
-                HostConfiguration config = client.getHostConfiguration();
-                config.setProxy(proxyHost.getHostName(), proxy.getPort());
-                if(proxy.isValid() == false) {
-                    log.info(classname, Thread.currentThread().getName() + 
-                        ". Set INVALID proxy ip: " + proxy.getIp() + ":" + proxy.getPort() + ". "  +
-                        proxyManager.getProxyInfo());
-                } else 
-                log.info(classname, Thread.currentThread().getName() + 
-                        ". Set proxy ip: " + proxy.getIp() + ":" + proxy.getPort() + ". "  +
-                        proxyManager.getProxyInfo());
-                
-            } else {
-                HostConfiguration config = client.getHostConfiguration();
-                config.setProxyHost(null);
-                log.info(classname, Thread.currentThread().getName() + ". Clear proxy. " +
-                        proxyManager.getProxyInfo());
-            }
-        }
-        
-        try {
-            if((previousResult != null) && (refererUrlStr != null)) {                
-                HttpState state = new HttpState();
-                Cookie[] cookies = 
-                        cookieItemListToCookies(previousResult.getCookieList());
-                state.addCookies(cookies);
-                client.setState(state);                
-            }
-//            requestSetHeader(request, host, refererUrlStr);
-            
-            log.debug(classname, Thread.currentThread().getName() + " send request");
-            client.executeMethod(request);
-            
-            log.debug(classname, Thread.currentThread().getName() + " get responce");
-            BufferedReader breader = new BufferedReader(
-                                        new InputStreamReader(
-                                        request.getResponseBodyAsStream(), "windows-1251"), 4096);
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while((line = breader.readLine()) != null) {
-                sb.append(line);
-            }
-            String responseBody = sb.toString();
-            
-            Cookie[] cookiesRet = client.getState().getCookies();
-            CookieItemList cookieList = 
-                        cookiesToCookieItemList(cookiesRet);
-            
-            return new QueryResult(responseBody, cookieList, proxy);
-        } catch (IOException ex) {            
-            if(proxy != null) {
-                proxy.setInvalid();
-                log.info(classname, Thread.currentThread().getName() + 
-                        ". Proxy invalid. ip:" + proxy.getIp() + ":" + proxy.getPort() +
-                        ". " + proxyManager.getProxyInfo());
-            } else {
-                log.info(classname, Thread.currentThread().getName() + 
-                        ". Proxy invalid. ip: null" +
-                        ". " + proxyManager.getProxyInfo());
-            }
-            throw new GetRequestException("gerRequestError.", ex);            
-        } finally {
-            if(proxyManager != null)
-                proxyManager.put(proxy);
-            request.releaseConnection();
-            connectionManager.putClient(httpClientItem);
         }
     }
     
