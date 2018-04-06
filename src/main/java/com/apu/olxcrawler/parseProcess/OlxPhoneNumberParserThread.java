@@ -11,6 +11,7 @@ import com.apu.olxcrawler.parser.OlxAnAdvertParser;
 import static com.apu.olxcrawler.parser.OlxParserUtils.getPatternCutOut;
 import com.apu.olxcrawler.query.GetRequest;
 import com.apu.olxcrawler.query.GetRequestException;
+import com.apu.olxcrawler.query.QueryParams;
 import com.apu.olxcrawler.query.QueryResult;
 import com.apu.olxcrawler.utils.Log;
 import java.util.concurrent.BlockingQueue;
@@ -92,8 +93,16 @@ public class OlxPhoneNumberParserThread implements Runnable {
         log.debug(classname, Thread.currentThread().getName() + ": " + phoneUrlStr);
         GetRequest request = new GetRequest();
         try {
+            QueryParams parameters = new QueryParams();
+            parameters.add(QueryParams.Parameter.URL_STR, phoneUrlStr);
+            parameters.add(QueryParams.Parameter.HOST_STR, GetRequest.OLX_HOST);
+            parameters.add(QueryParams.Parameter.ENCODING_TYPE, "utf-8");
+            parameters.add(QueryParams.Parameter.HEADER_ENABLE, true);
+            parameters.add(QueryParams.Parameter.REFERER_URL, urlStr);
+            parameters.add(QueryParams.Parameter.PREVIOUS_RESULT, result);
+            
             QueryResult phoneRequestResult = 
-                    request.makeRequest(phoneUrlStr, GetRequest.OLX_HOST, urlStr, result); //result.getCookies()
+                    request.makeRequestWithRetrans(parameters);
         
             String phoneStr = phoneRequestResult.getContent();
 

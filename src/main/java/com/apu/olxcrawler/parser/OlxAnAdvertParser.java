@@ -12,6 +12,7 @@ import com.apu.olxcrawler.entity.ExpandedLink;
 import com.apu.olxcrawler.parseProcess.PhoneNumberQuery;
 import static com.apu.olxcrawler.parser.OlxParserUtils.getPatternCutOut;
 import com.apu.olxcrawler.query.GetRequestException;
+import com.apu.olxcrawler.query.QueryParams;
 import com.apu.olxcrawler.query.QueryResult;
 import com.apu.olxcrawler.utils.DataChecker;
 import com.apu.olxcrawler.utils.Log;
@@ -50,7 +51,14 @@ public class OlxAnAdvertParser {
         String content;
         
         GetRequest request = new GetRequest();
-        QueryResult result = request.makeRequest(link.getLink(), GetRequest.OLX_HOST);
+        
+        QueryParams parameters = new QueryParams();
+        parameters.add(QueryParams.Parameter.URL_STR, link.getLink());
+        parameters.add(QueryParams.Parameter.HOST_STR, GetRequest.OLX_HOST);
+        parameters.add(QueryParams.Parameter.ENCODING_TYPE, "utf-8");
+        parameters.add(QueryParams.Parameter.HEADER_ENABLE, true);
+        
+        QueryResult result = request.makeRequest(parameters);
         content = result.getContent();
         
         advert.setAuthor(getAuthorFromContent(content));

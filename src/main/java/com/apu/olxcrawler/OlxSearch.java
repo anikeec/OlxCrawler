@@ -10,6 +10,7 @@ import com.apu.olxcrawler.parser.IllegalInputValueException;
 import com.apu.olxcrawler.parser.OlxSearchParser;
 import com.apu.olxcrawler.query.GetRequestException;
 import com.apu.olxcrawler.query.GetRequest;
+import com.apu.olxcrawler.query.QueryParams;
 import com.apu.olxcrawler.query.QueryResult;
 import com.apu.olxcrawler.utils.DataChecker;
 import com.apu.olxcrawler.utils.Log;
@@ -91,8 +92,14 @@ public class OlxSearch {
         return CLEAR_PATTERN.matcher(searchStr).replaceAll("-").trim();
     }
     
-    private String getRequest(String queryStr) throws GetRequestException { 
-        QueryResult result = new GetRequest().makeRequest(queryStr, GetRequest.OLX_HOST);
+    private String getRequest(String queryStr) throws GetRequestException {
+        QueryParams parameters = new QueryParams();
+        parameters.add(QueryParams.Parameter.URL_STR, queryStr);
+        parameters.add(QueryParams.Parameter.HOST_STR, GetRequest.OLX_HOST);
+        parameters.add(QueryParams.Parameter.ENCODING_TYPE, "utf-8");
+        parameters.add(QueryParams.Parameter.HEADER_ENABLE, true);
+            
+        QueryResult result = new GetRequest().makeRequest(parameters);
         if(result == null)
             return "";
         return result.getContent();

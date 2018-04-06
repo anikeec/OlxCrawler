@@ -5,21 +5,17 @@
  */
 package com.apu.olxcrawler.proxy;
 
-import static com.apu.olxcrawler.parser.OlxParserUtils.getPatternCutOut;
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.apu.olxcrawler.query.GetRequest;
+import com.apu.olxcrawler.query.GetRequestException;
+import com.apu.olxcrawler.query.QueryParams;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlTable;
-import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
-import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  *
@@ -27,76 +23,69 @@ import java.util.logging.Logger;
  */
 public class ProxyParser {
     
+    private String parseHostFromLink(String link) {
+        if(link == null)    
+                return null;
+        String startPattern = "//";
+        int startPosition = link.indexOf(startPattern);
+        if(startPosition == -1)
+                return null;
+        String endPattern = "/";
+        int endPosition = link.indexOf(endPattern, startPosition + startPattern.length());
+        if(endPosition == -1)
+                return null;
+        return link.substring(startPosition + startPattern.length(), endPosition);
+    }
+    
     List<ProxyItem> parse(String link) {
         List<ProxyItem> list = new ArrayList<>();
-        try {           
-            final WebClient client  = new WebClient();
-            HtmlPage currentPage = client.getPage(link);
-            client.waitForBackgroundJavaScript(10000);
-            HtmlTable table = (HtmlTable) currentPage.getByXPath("//table[@class='proxy__t']").get(0);
+        try { 
+            String host = parseHostFromLink(link);
+            QueryParams parameters = new QueryParams();
+            parameters.add(QueryParams.Parameter.URL_STR, link);
+            parameters.add(QueryParams.Parameter.HOST_STR, GetRequest.PROXY_HOST);
+            parameters.add(QueryParams.Parameter.ENCODING_TYPE, "windows-1251");
+            parameters.add(QueryParams.Parameter.IS_PROXY, true);
+            parameters.add(QueryParams.Parameter.HEADER_ENABLE, false);
+            
+            String content = 
+                        new GetRequest().makeRequest(parameters).getContent();
+            Document doc = Jsoup.parse(content);
+            Element table = doc.getElementsByClass("proxy__t").first();
+            if(table == null)
+                return list;
+            Elements rows = table.select("tr");
+            
             ProxyItem proxyItem;
-            String delay;
-            if(table != null) {
-                int ptr = 0;
-                List<HtmlTableRow> rows = table.getRows();
-                for (HtmlTableRow row : rows) {                    
-                    if(ptr==0) {
-                        ptr++;
-                        continue;
-                    }
-                    proxyItem = new ProxyItem("",0);
-                    List<HtmlTableCell> cells = row.getCells();
-                    
-                    proxyItem.setIp(cells.get(0).asText());
-                    
-                    try{
-                        proxyItem.setPort(Integer.parseInt(cells.get(1).asText()));
-                    } catch (NumberFormatException ex) {
-
-                    }
-                    
-                    proxyItem.setCountry(cells.get(2).asText());
-                    
-                    try{
-                        delay = cells.get(3).asText();
-                        if(delay != null) {
-                            delay = delay.replace(" мс", "");
-                            proxyItem.setDelay(Integer.parseInt(delay));
-                        }
-                    } catch (NumberFormatException ex) {
-
-                    }
-                    
+            
+            Element row;
+            Elements cols;
+            String ipStr;
+            String portStr;
+            String delayStr;
+            for (int i = 1; i < rows.size(); i++) { //first row is the col names so skip it.
+                row = rows.get(i);
+                cols = row.select("td");
+                ipStr = cols.get(0).text();
+                portStr = cols.get(1).text();
+                if(portStr != null) {
+                    int port = Integer.parseInt(portStr);
+                    proxyItem = new ProxyItem(ipStr, port);
+                    proxyItem.setCountry(cols.get(2).text());
+                    delayStr = cols.get(3).text();
+                    if(delayStr != null) {
+                        String endPattern = " мс";
+                        int ptr = delayStr.indexOf(endPattern);
+                        int delay = Integer.parseInt(delayStr.substring(0, ptr));
+                        proxyItem.setDelay(delay);
+                    }  
                     list.add(proxyItem);
-                    ptr++;
-                }
-            }
-            client.close();            
-        } catch (IOException ex) {
-            Logger.getLogger(ProxyParser.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (FailingHttpStatusCodeException ex) {
+                }                
+            }            
+        } catch (GetRequestException ex) {
             Logger.getLogger(ProxyParser.class.getName()).log(Level.SEVERE, null, ex);
         }
         return list;
-    }
-    
-    private String getUserIdFromLink(String link) {
-        if(link == null)    return null;
-        String regExpUrl = "https://www\\.olx\\.ua/" + "(.*)\\-ID(.*)\\.html(.*)";    
-        Pattern pattern = Pattern.compile(regExpUrl, Pattern.DOTALL);  
-        
-        Matcher matcher = pattern.matcher(link);        
-        if(matcher.matches() == false) return null;
-        
-        String startPattern = "-ID";
-        String endPattern = ".html";
-        return getPatternCutOut(link, startPattern, endPattern);    
-    }
-    
-    public static void main(String[] args) {
-        ProxyParser parser = new ProxyParser();
-        parser.parse("https://hidemy.name/ru/proxy-list/?maxtime=500&type=h#list");
-        System.out.println("");
     }
     
 }

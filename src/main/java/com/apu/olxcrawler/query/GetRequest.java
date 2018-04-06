@@ -23,7 +23,6 @@ import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.http.HttpHeaders;
-import org.apache.http.params.HttpConnectionParams;
 
 /**
  *
@@ -43,6 +42,135 @@ public class GetRequest {
     private final ConnectionManager connectionManager = 
                             ConnectionManager.getInstance();
     
+    public QueryResult makeRequest(QueryParams parameters) throws GetRequestException {
+        String urlStr = null;
+        String host = null;
+        QueryResult previousResult = null;
+        String refererUrlStr = null;
+        boolean isProxy = false;
+        boolean headerEnable = false;
+        String encodingType = "utf-8";
+        
+        if(parameters.get(QueryParams.Parameter.URL_STR) != null)
+            urlStr = (String)parameters.get(QueryParams.Parameter.URL_STR);
+        if(parameters.get(QueryParams.Parameter.HOST_STR) != null)
+            host = (String)parameters.get(QueryParams.Parameter.HOST_STR);        
+        if(parameters.get(QueryParams.Parameter.PREVIOUS_RESULT) != null)
+            previousResult = (QueryResult)parameters.get(QueryParams.Parameter.PREVIOUS_RESULT);
+        if(parameters.get(QueryParams.Parameter.REFERER_URL) != null)
+            refererUrlStr = (String)parameters.get(QueryParams.Parameter.REFERER_URL);
+        if(parameters.get(QueryParams.Parameter.IS_PROXY) != null)
+            isProxy = (boolean)parameters.get(QueryParams.Parameter.IS_PROXY);
+        if(parameters.get(QueryParams.Parameter.HEADER_ENABLE) != null)
+            headerEnable = (boolean)parameters.get(QueryParams.Parameter.HEADER_ENABLE);
+        if(parameters.get(QueryParams.Parameter.ENCODING_TYPE) != null)
+            encodingType = (String)parameters.get(QueryParams.Parameter.ENCODING_TYPE);        
+        
+        HttpClientItem httpClientItem = connectionManager.getClient();
+        HttpClient client = httpClientItem.getHttpClient();
+        client.getParams().setConnectionManagerTimeout(5000);
+//        client.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
+        
+        if((previousResult != null) && (refererUrlStr != null))
+            client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
+        GetMethod request = new GetMethod(urlStr);  
+
+        ProxyManager proxyManager = ProxyManager.getInstance();
+        ProxyItem proxy = null;        
+        if((previousResult != null) && (refererUrlStr != null)) {        
+            proxy = proxyManager.take();
+            if(proxy != null) {
+                HttpHost proxyHost = new HttpHost(proxy.getIp());
+                HostConfiguration config = client.getHostConfiguration();
+                config.setProxy(proxyHost.getHostName(), proxy.getPort());
+                if(proxy.isValid() == false) {
+                    log.info(classname, Thread.currentThread().getName() + 
+                        ". Set INVALID proxy ip: " + proxy.getIp() + ":" + proxy.getPort() + ". "  +
+                        proxyManager.getProxyInfo());
+                } else 
+                log.info(classname, Thread.currentThread().getName() + 
+                        ". Set proxy ip: " + proxy.getIp() + ":" + proxy.getPort() + ". "  +
+                        proxyManager.getProxyInfo());
+                
+            } else {
+                HostConfiguration config = client.getHostConfiguration();
+                config.setProxyHost(null);
+                log.info(classname, Thread.currentThread().getName() + ". Clear proxy. " +
+                        proxyManager.getProxyInfo());
+            }
+        }
+        
+        try {
+            if((previousResult != null) && (refererUrlStr != null)) {                
+                HttpState state = new HttpState();
+                Cookie[] cookies = 
+                        cookieItemListToCookies(previousResult.getCookieList());
+                state.addCookies(cookies);
+                client.setState(state);                
+            }
+            
+            if(headerEnable)
+                requestSetHeader(request, host, refererUrlStr);
+            
+            log.debug(classname, Thread.currentThread().getName() + " send request");
+            client.executeMethod(request);
+            
+            log.debug(classname, Thread.currentThread().getName() + " get responce");
+            BufferedReader breader = new BufferedReader(
+                                        new InputStreamReader(
+                                        request.getResponseBodyAsStream(), encodingType), 4096);  //"windows-1251"
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while((line = breader.readLine()) != null) {
+                sb.append(line);
+            }
+            String responseBody = sb.toString();
+            
+            Cookie[] cookiesRet = client.getState().getCookies();
+            CookieItemList cookieList = 
+                        cookiesToCookieItemList(cookiesRet);
+            
+            return new QueryResult(responseBody, cookieList, proxy);
+        } catch (IOException ex) {            
+            if(proxy != null) {
+                proxy.setInvalid();
+                log.info(classname, Thread.currentThread().getName() + 
+                        ". Proxy invalid. ip:" + proxy.getIp() + ":" + proxy.getPort() +
+                        ". " + proxyManager.getProxyInfo());
+            } else {
+                log.info(classname, Thread.currentThread().getName() + 
+                        ". Proxy invalid. ip: null" +
+                        ". " + proxyManager.getProxyInfo());
+            }
+            throw new GetRequestException("gerRequestError.", ex);            
+        } finally {
+            if(proxyManager != null)
+                proxyManager.put(proxy);
+            request.releaseConnection();
+            connectionManager.putClient(httpClientItem);
+        }
+    }
+    
+    public QueryResult makeRequestWithRetrans(QueryParams parameters) 
+                throws GetRequestException {
+        final int ERRORS_MAX = 5;
+        int errorCounter = 0;
+        QueryResult response;
+        while(true) {
+            try {
+                response = makeRequest(parameters);
+                if(response.getContent() != null)
+                    return response;
+            } catch(GetRequestException ex) {
+                errorCounter++;
+                log.error(classname, "Request error #" + errorCounter);
+                if(errorCounter >= ERRORS_MAX) {
+                    throw new GetRequestException("Server or proxy unavailable", ex);
+                }
+            }
+        }
+    }
+    
     /**
      * Make GET request 
      * 
@@ -51,9 +179,9 @@ public class GetRequest {
      * @return OlxResult - query response
      * @throws GetRequestException
      */
-    public QueryResult makeRequest(String urlStr, String host) throws GetRequestException {        
-        return makeRequest(urlStr, host, null, null);
-    }
+//    public QueryResult makeRequest(String urlStr, String host) throws GetRequestException {        
+//        return makeRequest(urlStr, host, null, null);
+//    }
     
     /**
      * Make GET request with additional parameters.
@@ -143,7 +271,7 @@ public class GetRequest {
                 state.addCookies(cookies);
                 client.setState(state);                
             }
-            requestSetHeader(request, host, refererUrlStr);
+//            requestSetHeader(request, host, refererUrlStr);
             
             log.debug(classname, Thread.currentThread().getName() + " send request");
             client.executeMethod(request);
@@ -151,7 +279,7 @@ public class GetRequest {
             log.debug(classname, Thread.currentThread().getName() + " get responce");
             BufferedReader breader = new BufferedReader(
                                         new InputStreamReader(
-                                        request.getResponseBodyAsStream(), "UTF-8"));
+                                        request.getResponseBodyAsStream(), "windows-1251"), 4096);
             StringBuilder sb = new StringBuilder();
             String line;
             while((line = breader.readLine()) != null) {
